@@ -1,4 +1,4 @@
-package com.kt.uptodo.presentation.ui.theme
+package com.kt.uptodo.presentation.theme
 
 import android.app.Activity
 import android.os.Build
