@@ -1,6 +1,8 @@
 package com.kt.uptodo.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,17 +21,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.CategoryEntity
+import com.kt.uptodo.data.enums.Priority
 import com.kt.uptodo.data.relations.TaskDetail
+import com.kt.uptodo.extensions.parse
 import com.kt.uptodo.presentation.theme.UpTodoTheme
 import com.kt.uptodo.utils.Gap
+import com.kt.uptodo.utils.SECONDARY_ALPHA
 import com.kt.uptodo.utils.fakeTasks
 import com.kt.uptodo.utils.padding
+import java.time.Duration
+import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 
 @Composable
 fun TaskItem(
@@ -38,64 +47,124 @@ fun TaskItem(
 ) {
     var isChecked by remember { mutableStateOf(false) }
 
-    Box {
+    val now = OffsetDateTime.now()
+    val endDate = taskDetail.task.end
+
+    val deadlineText = if (now.dayOfMonth == endDate.dayOfMonth) {
+        "Today at " + endDate.parse()
+    } else {
+        val duration = Duration.between(now, endDate)
+        val minutesLeft = duration.toMinutes()
+        val hoursLeft = duration.toHours()
+        val daysLeft = duration.toDays()
+
+        when {
+            minutesLeft < 60 -> "Due in $minutesLeft minutes" // Nếu còn dưới 1 giờ
+            hoursLeft < 24 -> "Due in $hoursLeft hours" // Nếu còn dưới 24 giờ
+            daysLeft in 1..6 -> {
+                val remainingHours = hoursLeft % 24
+                "Due in $daysLeft days, $remainingHours hours"
+            }
+
+            else -> "Due in $daysLeft days"
+        }
+    }
+
+    Box(
+        modifier = Modifier.clickable {}
+    ) {
         Row(
-            modifier = Modifier
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .fillMaxWidth()
                 .padding(MaterialTheme.padding.small)
         ) {
-            Checkbox(
-                checked = isChecked,
-                onCheckedChange = {
-                    isChecked = !isChecked
-                }
-            )
-            Gap(width = MaterialTheme.padding.medium)
+//            Gap(width = MaterialTheme.padding.medium)
 
             Column(
                 modifier = Modifier
-                    .weight(1f)
+                    .fillMaxWidth()
             ) {
                 Text(
                     text = taskDetail.task.title,
                     style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    CategoryItem(category = taskDetail.category)
+                    Text(
+                        text = deadlineText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.medium)
-                            .border(
-                                1.dp,
-                                MaterialTheme.colorScheme.outline,
-                                MaterialTheme.shapes.medium
-                            )
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Box(
-                            modifier = Modifier.padding(MaterialTheme.padding.extraSmall)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_flag_2),
-                                contentDescription = null
-                            )
-                            Text(
-                                text = taskDetail.task.priority.name,
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        }
+                        CategoryItem(category = taskDetail.category)
+                        Gap(width = MaterialTheme.padding.small)
+                        PriorityItem(priority = taskDetail.task.priority)
                     }
                 }
             }
 
         }
+    }
+}
+
+@Composable
+fun CategoryItem(
+    modifier: Modifier = Modifier,
+    category: CategoryEntity
+) {
+    Box(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.extraSmall)
+            .background(category.color)
+    ) {
+        Text(
+            text = category.name,
+            style = MaterialTheme.typography.labelMedium,
+            color = Color.White,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(MaterialTheme.padding.small)
+        )
+    }
+}
+
+@Composable
+private fun PriorityItem(modifier: Modifier = Modifier, priority: Priority) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.extraSmall)
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.outline,
+                MaterialTheme.shapes.extraSmall
+            )
+            .padding(MaterialTheme.padding.extraSmall)
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_flag_2),
+            contentDescription = null
+        )
+        Text(
+            text = priority.name,
+            style = MaterialTheme.typography.labelSmall
+        )
     }
 }
 
@@ -106,7 +175,7 @@ private fun Test() {
         TaskItem(
             taskDetail = TaskDetail(
                 task = fakeTasks[1],
-                category = CategoryEntity(name = "Học")
+                category = CategoryEntity(name = "Học", color = Color.Red)
             )
         )
     }

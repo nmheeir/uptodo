@@ -5,4 +5,12 @@
     <string name="Calendar">Calendar</string>
     <string name="Focus">Focus</string>
     <string name="more">More</string>
+
+    <string name="empty_description">What do you want to do today?</string>
+
+    <string name="label_today">Today</string>
+    <string name="label_complete">Complete</string>
+
+    <!--Action-->
+    <string name="action_add_task">Tap + to add your task</string>
 </resources>

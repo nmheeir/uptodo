@@ -10,11 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun RowScope.Gap(modifier: Modifier = Modifier, width: Dp) {
+fun RowScope.Gap(width: Dp, modifier: Modifier = Modifier) {
     Spacer(modifier = modifier.width(width))
 }
 
 @Composable
-fun ColumnScope.Gap(modifier: Modifier = Modifier, height: Dp) {
+fun ColumnScope.Gap(height: Dp, modifier: Modifier = Modifier) {
     Spacer(modifier = modifier.height(height))
 }

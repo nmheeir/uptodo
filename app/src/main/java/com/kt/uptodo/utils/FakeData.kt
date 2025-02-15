@@ -1,7 +1,9 @@
 package com.kt.uptodo.utils
 
+import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.enums.Priority
+import com.kt.uptodo.data.relations.TaskDetail
 import java.time.OffsetDateTime
 
 val fakeTasks = listOf(
@@ -86,7 +88,7 @@ val fakeTasks = listOf(
     TaskEntity(
         taskId = 7,
         parentTask = null,
-        categoryId = 5,
+        categoryId = 1,
         title = "Đọc sách",
         description = "Đọc 10 trang sách",
         priority = Priority.LOW,
@@ -136,3 +138,18 @@ val fakeTasks = listOf(
         end = OffsetDateTime.now().plusHours(1)
     )
 )
+
+val fakeCategories = listOf(
+    CategoryEntity(1, "Cá nhân", categoryColors[1]),
+    CategoryEntity(2, "Công việc",  categoryColors[2]),
+    CategoryEntity(3, "Học tập", categoryColors[3]),
+    CategoryEntity(4, "Sức khỏe", categoryColors[4]),
+    CategoryEntity(5, "Giải trí", categoryColors[1])
+)
+
+
+val fakeTaskDetails = fakeTasks.map { task ->
+    val category =
+        fakeCategories.find { it.categoryId == task.categoryId } ?: fakeCategories.first()
+    TaskDetail(task = task, category = category)
+}

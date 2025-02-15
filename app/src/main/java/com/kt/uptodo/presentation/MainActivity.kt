@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
 
 
                     CompositionLocalProvider(
-                        LocalWindowInset provides localWindowInset
+                        LocalWindowInsets provides localWindowInset
                     ) {
                         NavHost(
                             navController = navController,
@@ -174,5 +174,5 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-val LocalWindowInset =
+val LocalWindowInsets =
     compositionLocalOf<WindowInsets> { error("CompositionLocal LocalWindowInset not present") }
