@@ -4,14 +4,48 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastForEach
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.kt.uptodo.presentation.navigation.Screens
+import com.kt.uptodo.presentation.navigation.navigationBuilder
 import com.kt.uptodo.presentation.theme.UpTodoTheme
+import com.kt.uptodo.utils.Constants
+import com.kt.uptodo.utils.Constants.NavigationBarHeight
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -19,10 +53,126 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
+
             UpTodoTheme {
+                val navController = rememberNavController()
+
+                val backStackEntry by navController.currentBackStackEntryAsState()
+
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    val navigationItems = remember { Screens.MainScreens }
+                    val topLevelScreens = listOf(
+                        Screens.Index.route,
+                        Screens.Calendar.route,
+                        Screens.Focus.route,
+                        Screens.More.route
+                    )
+
+                    val windowInsets = WindowInsets.systemBars
+                    val density = LocalDensity.current
+                    val bottomInset = with(density) { windowInsets.getBottom(density).toDp() }
+                    val topInset = with(density) { windowInsets.getTop(density).toDp() }
+
+                    val shouldShowNavigationBar = remember(backStackEntry) {
+                        backStackEntry?.destination?.route == null
+                                || navigationItems.fastAny { it.route == backStackEntry?.destination?.route }
+                    }
+
+                    val navigationBarHeight by animateDpAsState(
+                        targetValue = if (shouldShowNavigationBar) Constants.NavigationBarHeight else 0.dp,
+                        animationSpec = spring<Dp>(stiffness = Spring.StiffnessMedium)
+                    )
+
+                    val localWindowInset =
+                        remember(bottomInset) {
+                            var bottom = bottomInset
+                            if (shouldShowNavigationBar) bottom += Constants.NavigationBarHeight
+
+                            windowInsets
+                                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+                                .add(WindowInsets(bottom = bottom, top = topInset))
+                        }
+
+
+                    CompositionLocalProvider(
+                        LocalWindowInset provides localWindowInset
+                    ) {
+                        NavHost(
+                            navController = navController,
+                            startDestination = Screens.Index.route
+                        ) {
+                            navigationBuilder(navController)
+                        }
+                    }
+
+
+                    NavigationBar(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .offset {
+                                if (navigationBarHeight == 0.dp) {
+                                    IntOffset(
+                                        x = 0,
+                                        y = (bottomInset + NavigationBarHeight).roundToPx()
+                                    )
+                                } else {
+                                    val hideOffset =
+                                        (bottomInset + NavigationBarHeight) * (1 - navigationBarHeight / NavigationBarHeight)
+                                    IntOffset(x = 0, y = hideOffset.roundToPx())
+                                }
+                            }
+                    ) {
+                        navigationItems.fastForEach { screens ->
+                            key(screens.route) {
+                                NavigationBarItem(
+                                    selected = backStackEntry?.destination?.hierarchy?.any { it.route == screens.route } == true,
+                                    onClick = {
+                                        if (backStackEntry?.destination?.hierarchy?.any { it.route == screens.route } == true) {
+                                            backStackEntry?.savedStateHandle?.set(
+                                                "scrollToTop",
+                                                true
+                                            )
+                                        } else {
+                                            navController.navigate(screens.route) {
+                                                popUpTo(navController.graph.startDestinationId) {
+                                                    saveState = true
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
+                                        }
+                                    },
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(screens.iconId),
+                                            contentDescription = null
+                                        )
+                                    },
+                                    label = {
+                                        Text(
+                                            text = stringResource(screens.titleId),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
 
             }
         }
     }
 }
+
+val LocalWindowInset =
+    compositionLocalOf<WindowInsets> { error("CompositionLocal LocalWindowInset not present") }

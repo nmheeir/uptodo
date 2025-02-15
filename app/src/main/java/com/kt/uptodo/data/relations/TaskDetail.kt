@@ -5,7 +5,7 @@ import androidx.room.Relation
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.entities.TaskEntity
 
-data class TaskAndCategory(
+data class TaskDetail(
     @Embedded val task: TaskEntity,
 
     @Relation(

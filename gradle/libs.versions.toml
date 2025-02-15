@@ -17,6 +17,8 @@ room = "2.6.1"
 datastore = "1.1.2"
 timber = "5.0.1"
 
+kotlinxCollectionsImmutable = "0.3.8"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +47,10 @@ room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
+
+navigation = { group = "androidx.navigation", name = "navigation-compose", version = "2.8.7" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

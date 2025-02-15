@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">UpTodo</string>
+
+    <string name="index">Index</string>
+    <string name="Calendar">Calendar</string>
+    <string name="Focus">Focus</string>
+    <string name="more">More</string>
 </resources>

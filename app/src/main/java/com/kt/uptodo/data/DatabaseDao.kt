@@ -9,7 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.entities.TaskEntity
-import com.kt.uptodo.data.relations.TaskAndCategory
+import com.kt.uptodo.data.relations.TaskDetail
 
 @Dao
 interface DatabaseDao {
@@ -38,9 +38,9 @@ interface DatabaseDao {
     /*Transaction*/
     @Transaction
     @Query("SELECT * FROM tasks")
-    fun task(): List<TaskAndCategory>
+    fun task(): List<TaskDetail>?
 
     @Transaction
     @Query("SELECT * FROM tasks WHERE taskId = :taskId")
-    fun task(taskId: Long): TaskAndCategory
+    fun task(taskId: Long): TaskDetail?
 }

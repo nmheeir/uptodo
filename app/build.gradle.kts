@@ -80,4 +80,10 @@ dependencies {
     implementation (libs.androidx.datastore)
 
     implementation (libs.timber)
+
+    //Kotlin Collection Immutable
+    implementation(libs.kotlinx.collections.immutable)
+
+    implementation(libs.navigation)
+
 }
