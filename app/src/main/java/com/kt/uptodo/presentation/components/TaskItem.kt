@@ -68,7 +68,9 @@ fun TaskItem(
     Box(
         modifier = Modifier
             .clip(MaterialTheme.shapes.extraSmall)
-            .clickable {}
+            .clickable {
+                onClick()
+            }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

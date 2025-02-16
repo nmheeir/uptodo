@@ -54,6 +54,7 @@ fun IndexScreen(
 
         else -> {
             IndexContent(
+                navController = navController,
                 taskDetails = taskDetails
             )
         }
@@ -63,6 +64,7 @@ fun IndexScreen(
 @Composable
 private fun IndexContent(
     modifier: Modifier = Modifier,
+    navController: NavHostController,
     taskDetails: List<TaskDetail>
 ) {
     val lazyListState = rememberLazyListState()
@@ -96,7 +98,7 @@ private fun IndexContent(
                 TaskItem(
                     taskDetail = taskDetail,
                     onClick = {
-
+                        navController.navigate("task_detail/${taskDetail.task.taskId}")
                     }
                 )
             }

@@ -2,11 +2,14 @@ package com.kt.uptodo.presentation.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.kt.uptodo.presentation.screens.CalendarScreen
 import com.kt.uptodo.presentation.screens.FocusScreen
 import com.kt.uptodo.presentation.screens.IndexScreen
 import com.kt.uptodo.presentation.screens.MoreScreen
+import com.kt.uptodo.presentation.screens.TaskDetailScreen
 
 fun NavGraphBuilder.navigationBuilder(
     navController: NavHostController
@@ -31,5 +34,16 @@ fun NavGraphBuilder.navigationBuilder(
         route = Screens.More.route
     ) {
         MoreScreen()
+    }
+
+    composable(
+        route = "task_detail/{taskId}",
+        arguments = listOf(
+            navArgument("taskId") {
+                type = NavType.LongType
+            }
+        )
+    ) {
+        TaskDetailScreen(navController)
     }
 }
