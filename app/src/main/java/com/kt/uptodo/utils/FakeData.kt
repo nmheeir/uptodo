@@ -1,9 +1,11 @@
 package com.kt.uptodo.utils
 
+import androidx.compose.ui.graphics.Color
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.enums.Priority
 import com.kt.uptodo.data.relations.TaskDetail
+import com.kt.uptodo.extensions.toHex
 import java.time.OffsetDateTime
 
 val fakeTasks = listOf(
@@ -139,13 +141,22 @@ val fakeTasks = listOf(
     )
 )
 
+/*val fakeCategories = listOf(
+    CategoryEntity(1, "Cá nhân"),
+    CategoryEntity(2, "Công việc"),
+    CategoryEntity(3, "Học tập"),
+    CategoryEntity(4, "Sức khỏe"),
+    CategoryEntity(5, "Giải trí")
+)*/
+
 val fakeCategories = listOf(
-    CategoryEntity(1, "Cá nhân", categoryColors[1]),
-    CategoryEntity(2, "Công việc",  categoryColors[2]),
-    CategoryEntity(3, "Học tập", categoryColors[3]),
-    CategoryEntity(4, "Sức khỏe", categoryColors[4]),
-    CategoryEntity(5, "Giải trí", categoryColors[1])
+    CategoryEntity(1, "Cá nhân", Color.Red.toHex()),
+    CategoryEntity(2, "Công việc", Color.Magenta.toHex()),
+    CategoryEntity(3, "Học tập", Color.Gray.toHex()),
+    CategoryEntity(4, "Sức khỏe", Color.Green.toHex()),
+    CategoryEntity(5, "Giải trí", Color.DarkGray.toHex())
 )
+
 
 
 val fakeTaskDetails = fakeTasks.map { task ->

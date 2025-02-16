@@ -2,6 +2,7 @@ package com.kt.uptodo.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.kt.uptodo.R
 import com.kt.uptodo.data.relations.TaskDetail
+import com.kt.uptodo.presentation.LocalWindowInsets
 import com.kt.uptodo.presentation.components.TaskItem
 import com.kt.uptodo.presentation.theme.UpTodoTheme
 import com.kt.uptodo.presentation.viewmodels.IndexViewModel
@@ -51,7 +53,9 @@ fun IndexScreen(
         }
 
         else -> {
-
+            IndexContent(
+                taskDetails = taskDetails
+            )
         }
     }
 }
@@ -66,18 +70,22 @@ private fun IndexContent(
     LazyColumn(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
-//        contentPadding = LocalWindowInsets.current.asPaddingValues(),
+        contentPadding = LocalWindowInsets.current.asPaddingValues(),
         modifier = modifier.padding(horizontal = MaterialTheme.padding.mediumSmall)
     ) {
         taskDetails.takeIf { it.isNotEmpty() }?.let {
             item {
                 Text(
                     text = stringResource(R.string.label_today),
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier
-                        .padding(MaterialTheme.padding.extraSmall)
                         .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.onSurface)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(
+                            horizontal = MaterialTheme.padding.medium,
+                            vertical = MaterialTheme.padding.small
+                        )
                 )
             }
 
@@ -85,21 +93,28 @@ private fun IndexContent(
                 items = taskDetails,
                 key = { it.hashCode() }
             ) { taskDetail ->
-                TaskItem(taskDetail = taskDetail)
+                TaskItem(
+                    taskDetail = taskDetail,
+                    onClick = {
+
+                    }
+                )
+            }
+
+            item {
+                Text(
+                    text = stringResource(R.string.label_complete),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(
+                            horizontal = MaterialTheme.padding.medium,
+                            vertical = MaterialTheme.padding.small
+                        )
+                )
             }
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-private fun Test() {
-    UpTodoTheme(
-//        darkTheme = true
-    ) {
-        IndexContent(
-            taskDetails = fakeTaskDetails
-        )
-    }
-}
-

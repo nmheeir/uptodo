@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 object Constants {
-    val NavigationBarHeight = 64.dp
+    val NavigationBarHeight = 80.dp
 }
 
 val categoryColors = listOf(

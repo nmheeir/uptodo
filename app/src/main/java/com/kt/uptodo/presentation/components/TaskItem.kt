@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,26 +23,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.enums.Priority
 import com.kt.uptodo.data.relations.TaskDetail
-import com.kt.uptodo.extensions.parse
-import com.kt.uptodo.presentation.theme.UpTodoTheme
+import com.kt.uptodo.extensions.parseMinute
 import com.kt.uptodo.utils.Gap
-import com.kt.uptodo.utils.SECONDARY_ALPHA
-import com.kt.uptodo.utils.fakeTasks
 import com.kt.uptodo.utils.padding
 import java.time.Duration
 import java.time.OffsetDateTime
-import java.time.temporal.ChronoUnit
 
 @Composable
 fun TaskItem(
     modifier: Modifier = Modifier,
-    taskDetail: TaskDetail
+    taskDetail: TaskDetail,
+    onClick: () -> Unit
 ) {
     var isChecked by remember { mutableStateOf(false) }
 
@@ -51,7 +46,7 @@ fun TaskItem(
     val endDate = taskDetail.task.end
 
     val deadlineText = if (now.dayOfMonth == endDate.dayOfMonth) {
-        "Today at " + endDate.parse()
+        "Today at " + endDate.parseMinute()
     } else {
         val duration = Duration.between(now, endDate)
         val minutesLeft = duration.toMinutes()
@@ -59,8 +54,8 @@ fun TaskItem(
         val daysLeft = duration.toDays()
 
         when {
-            minutesLeft < 60 -> "Due in $minutesLeft minutes" // Nếu còn dưới 1 giờ
-            hoursLeft < 24 -> "Due in $hoursLeft hours" // Nếu còn dưới 24 giờ
+            minutesLeft < 60 -> "Due in $minutesLeft minutes"
+            hoursLeft < 24 -> "Due in $hoursLeft hours"
             daysLeft in 1..6 -> {
                 val remainingHours = hoursLeft % 24
                 "Due in $daysLeft days, $remainingHours hours"
@@ -71,7 +66,9 @@ fun TaskItem(
     }
 
     Box(
-        modifier = Modifier.clickable {}
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.extraSmall)
+            .clickable {}
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -88,7 +85,7 @@ fun TaskItem(
             ) {
                 Text(
                     text = taskDetail.task.title,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -130,12 +127,12 @@ fun CategoryItem(
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraSmall)
-            .background(category.color)
+            .background(Color(android.graphics.Color.parseColor(category.color)))
     ) {
         Text(
             text = category.name,
             style = MaterialTheme.typography.labelMedium,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(MaterialTheme.padding.small)
@@ -164,19 +161,6 @@ private fun PriorityItem(modifier: Modifier = Modifier, priority: Priority) {
         Text(
             text = priority.name,
             style = MaterialTheme.typography.labelSmall
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun Test() {
-    UpTodoTheme {
-        TaskItem(
-            taskDetail = TaskDetail(
-                task = fakeTasks[1],
-                category = CategoryEntity(name = "Học", color = Color.Red)
-            )
         )
     }
 }

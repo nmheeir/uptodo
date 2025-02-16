@@ -85,5 +85,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.navigation)
+    //Material Theme
+    implementation(libs.material)
 
 }

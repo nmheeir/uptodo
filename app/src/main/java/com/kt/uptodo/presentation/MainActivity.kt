@@ -3,7 +3,6 @@ package com.kt.uptodo.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -37,6 +36,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -47,12 +47,13 @@ import com.kt.uptodo.presentation.theme.UpTodoTheme
 import com.kt.uptodo.utils.Constants
 import com.kt.uptodo.utils.Constants.NavigationBarHeight
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
 
@@ -86,20 +87,19 @@ class MainActivity : ComponentActivity() {
                     }
 
                     val navigationBarHeight by animateDpAsState(
-                        targetValue = if (shouldShowNavigationBar) Constants.NavigationBarHeight else 0.dp,
+                        targetValue = if (shouldShowNavigationBar) NavigationBarHeight else 0.dp,
                         animationSpec = spring<Dp>(stiffness = Spring.StiffnessMedium)
                     )
 
                     val localWindowInset =
-                        remember(bottomInset) {
+                        remember(bottomInset, shouldShowNavigationBar) {
                             var bottom = bottomInset
-                            if (shouldShowNavigationBar) bottom += Constants.NavigationBarHeight
+                            if (shouldShowNavigationBar) bottom += NavigationBarHeight
 
                             windowInsets
                                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
                                 .add(WindowInsets(bottom = bottom, top = topInset))
                         }
-
 
                     CompositionLocalProvider(
                         LocalWindowInsets provides localWindowInset

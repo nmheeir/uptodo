@@ -1,6 +1,5 @@
 package com.kt.uptodo.data
 
-import androidx.compose.ui.graphics.Color
 import androidx.room.TypeConverter
 import com.kt.uptodo.data.enums.Priority
 import java.time.OffsetDateTime
