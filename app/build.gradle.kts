@@ -88,4 +88,6 @@ dependencies {
     //Material Theme
     implementation(libs.material)
 
+    implementation("com.kizitonwose.calendar:compose:2.6.2")
+
 }

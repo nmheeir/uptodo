@@ -20,7 +20,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,27 +30,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.relations.TaskDetail
 import com.kt.uptodo.extensions.convertToDeadline
+import com.kt.uptodo.presentation.CategoryDialog
 import com.kt.uptodo.presentation.LocalWindowInsets
 import com.kt.uptodo.presentation.components.TaskItem
+import com.kt.uptodo.presentation.components.TextFieldDialog
 import com.kt.uptodo.presentation.theme.UpTodoTheme
+import com.kt.uptodo.presentation.viewmodels.TaskDetailAction
+import com.kt.uptodo.presentation.viewmodels.TaskDetailEvent
 import com.kt.uptodo.presentation.viewmodels.TaskDetailViewModel
 import com.kt.uptodo.utils.Gap
+import com.kt.uptodo.utils.fakeCategories
 import com.kt.uptodo.utils.fakeTaskDetails
-import com.kt.uptodo.utils.fakeTasks
 import com.kt.uptodo.utils.padding
 
 @Composable
@@ -59,8 +66,40 @@ fun TaskDetailScreen(
     navController: NavHostController,
     viewModel: TaskDetailViewModel = hiltViewModel()
 ) {
+    val task by viewModel.taskDetail.collectAsStateWithLifecycle()
+    val subTask by viewModel.subTask.collectAsStateWithLifecycle()
+    when {
+        task == null -> {
+            EmptyScreen(R.string.empty_description)
+        }
+
+        else -> {
+            TaskScreenContent(
+                navController = navController,
+                task = task!!,
+                subTask = subTask,
+                action = viewModel::onAction
+            )
+        }
+    }
+}
+
+@Composable
+private fun TaskScreenContent(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    task: TaskDetail,
+    subTask: List<TaskDetail>,
+    action: (TaskDetailAction) -> Unit
+) {
+    var showEditTaskTitleDialog by remember { mutableStateOf(false) }
+    var showTaskTimeDialog by remember { mutableStateOf(false) }
+    var showTaskCategoryDialog by remember { mutableStateOf(false) }
+    var showTaskPriorityDialog by remember { mutableStateOf(false) }
+    var showAddSubTaskDialog by remember { mutableStateOf(false) }
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .padding(LocalWindowInsets.current.asPaddingValues())
@@ -73,30 +112,22 @@ fun TaskDetailScreen(
                 .fillMaxWidth()
         ) {
             IconButton(
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
                 onClick = navController::navigateUp
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_close),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
 
             IconButton(
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                onClick = {
-
-                }
+                onClick = { showEditTaskTitleDialog = true }
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_border_color),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }
@@ -108,14 +139,36 @@ fun TaskDetailScreen(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            TaskDetailContent(taskDetail = fakeTaskDetails[1], subTask = fakeTaskDetails.take(2))
+            TaskDetailContent(
+                taskDetail = task,
+                subTask = subTask,
+                showDialog = {
+                    when (it) {
+                        TaskDetailEvent.ShowAddSubTaskDialog -> {
+                            showAddSubTaskDialog = true
+                        }
+
+                        TaskDetailEvent.ShowTaskCategoryDialog -> {
+                            showTaskCategoryDialog = true
+                        }
+
+                        TaskDetailEvent.ShowTaskPriorityDialog -> {
+                            showTaskPriorityDialog = true
+                        }
+
+                        TaskDetailEvent.ShowTaskTimeDialog -> {
+                            showTaskTimeDialog = true
+                        }
+                    }
+                }
+            )
         }
 
         Button(
             shape = MaterialTheme.shapes.extraSmall,
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ),
             onClick = {},
             modifier = Modifier
@@ -127,13 +180,54 @@ fun TaskDetailScreen(
             )
         }
     }
+
+    if (showEditTaskTitleDialog) {
+        TextFieldDialog(
+            title = {
+                Text(
+                    text = stringResource(R.string.label_edit_task_title)
+                )
+            },
+            initialTextFieldValue = TextFieldValue(
+                text = task.task.title,
+                selection = TextRange(task.task.title.length)
+            ),
+            onDone = {
+                action(TaskDetailAction.UpdateTaskTitle(it))
+                showEditTaskTitleDialog = false
+            },
+            onDismiss = { showEditTaskTitleDialog = false }
+        )
+    }
+
+    if (showTaskTimeDialog) {
+
+    }
+
+    if (showTaskPriorityDialog) {
+
+    }
+    if (showAddSubTaskDialog) {
+
+    }
+    if (showTaskCategoryDialog) {
+        CategoryDialog(
+            categories = fakeCategories,
+            selectedCategory = task.category,
+            onValueSelected = {
+                action(TaskDetailAction.UpdateTaskCategory(it))
+            },
+            onDismiss = { showTaskCategoryDialog = false }
+        )
+    }
 }
 
 @Composable
 private fun TaskDetailContent(
     modifier: Modifier = Modifier,
     taskDetail: TaskDetail,
-    subTask: List<TaskDetail>
+    subTask: List<TaskDetail>,
+    showDialog: (TaskDetailEvent) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
@@ -146,28 +240,32 @@ private fun TaskDetailContent(
             icon = R.drawable.ic_timer,
             title = stringResource(id = R.string.label_task_timer),
             content = taskDetail.task.end.convertToDeadline(),
-            onClick = { }
+            onClick = { showDialog(TaskDetailEvent.ShowTaskTimeDialog) }
         )
 
         TaskDetailRow(
             icon = R.drawable.ic_sell,
             title = stringResource(R.string.label_task_category),
             content = taskDetail.category.name,
-            onClick = { }
+            containerColor = Color(android.graphics.Color.parseColor(taskDetail.category.color)).copy(
+                alpha = 0.32f
+            ),
+            contentColor = Color(android.graphics.Color.parseColor(taskDetail.category.color)),
+            onClick = { showDialog(TaskDetailEvent.ShowTaskCategoryDialog) }
         )
 
         TaskDetailRow(
             icon = R.drawable.ic_flag_2,
             title = stringResource(R.string.label_task_priority),
             content = taskDetail.task.priority.name,
-            onClick = { }
+            onClick = { showDialog(TaskDetailEvent.ShowTaskPriorityDialog) }
         )
 
         TaskDetailRow(
             icon = R.drawable.ic_graph_1,
             title = stringResource(R.string.label_sub_task),
             content = stringResource(R.string.action_add_subtask),
-            onClick = { }
+            onClick = { showDialog(TaskDetailEvent.ShowAddSubTaskDialog) }
         )
 
         if (subTask.isNotEmpty()) {
@@ -199,7 +297,6 @@ private fun TaskDetailContent(
                 )
             }
         }
-
     }
 }
 
@@ -209,6 +306,8 @@ private fun TaskDetailRow(
     @DrawableRes icon: Int,
     title: String,
     content: String,
+    contentColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
+    containerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
     onClick: () -> Unit
 ) {
     Row(
@@ -232,8 +331,8 @@ private fun TaskDetailRow(
 
         TextButton(
             colors = ButtonDefaults.textButtonColors(
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
+                contentColor = contentColor,
+                containerColor = containerColor
             ),
             shape = MaterialTheme.shapes.medium,
             onClick = onClick
@@ -245,7 +344,6 @@ private fun TaskDetailRow(
             )
         }
     }
-
 }
 
 @Composable
@@ -343,6 +441,10 @@ private fun TaskDetailDescription(
 @Composable
 private fun Test() {
     UpTodoTheme {
-        TaskDetailContent(taskDetail = fakeTaskDetails[1], subTask = fakeTaskDetails.take(2))
+        TaskDetailContent(
+            taskDetail = fakeTaskDetails[1],
+            subTask = fakeTaskDetails.take(2),
+            showDialog = {}
+        )
     }
 }

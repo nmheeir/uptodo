@@ -16,6 +16,7 @@
     <string name="label_task_category">Task Category</string>
     <string name="label_task_priority">Task Priority</string>
     <string name="label_sub_task">Sub Task</string>
+    <string name="label_edit_task_title">Edit task title</string>
 
     <!--Action-->
     <string name="action_add_task">Tap + to add your task</string>
@@ -23,4 +24,5 @@
     <string name="action_add_subtask">Add sub task</string>
     <string name="action_delete_task">Delete task</string>
     <string name="action_complete_task">Complete task</string>
+    <string name="action_add_category">Add Category</string>
 </resources>

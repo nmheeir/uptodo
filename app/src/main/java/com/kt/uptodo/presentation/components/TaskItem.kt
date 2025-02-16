@@ -79,7 +79,6 @@ fun TaskItem(
                 .fillMaxWidth()
                 .padding(MaterialTheme.padding.small)
         ) {
-//            Gap(width = MaterialTheme.padding.medium)
 
             Column(
                 modifier = Modifier
@@ -129,12 +128,12 @@ fun CategoryItem(
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraSmall)
-            .background(Color(android.graphics.Color.parseColor(category.color)))
+            .background(Color(android.graphics.Color.parseColor(category.color)).copy(alpha = 0.24f))
     ) {
         Text(
             text = category.name,
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            color = Color(android.graphics.Color.parseColor(category.color)),
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(MaterialTheme.padding.small)

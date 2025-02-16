@@ -141,14 +141,6 @@ val fakeTasks = listOf(
     )
 )
 
-/*val fakeCategories = listOf(
-    CategoryEntity(1, "Cá nhân"),
-    CategoryEntity(2, "Công việc"),
-    CategoryEntity(3, "Học tập"),
-    CategoryEntity(4, "Sức khỏe"),
-    CategoryEntity(5, "Giải trí")
-)*/
-
 val fakeCategories = listOf(
     CategoryEntity(1, "Cá nhân", Color.Red.toHex()),
     CategoryEntity(2, "Công việc", Color.Magenta.toHex()),
