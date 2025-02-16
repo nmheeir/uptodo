@@ -29,7 +29,7 @@ class IndexViewModel @Inject constructor(
     }
 
     private suspend fun getTasks() {
-        delay(1000)
+//        delay(1000)
         taskDetails.value = fakeTaskDetails
     }
 }

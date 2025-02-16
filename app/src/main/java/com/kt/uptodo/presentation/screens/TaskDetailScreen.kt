@@ -49,6 +49,7 @@ import com.kt.uptodo.presentation.LocalWindowInsets
 import com.kt.uptodo.presentation.components.TaskItem
 import com.kt.uptodo.presentation.theme.UpTodoTheme
 import com.kt.uptodo.presentation.viewmodels.TaskDetailViewModel
+import com.kt.uptodo.utils.Gap
 import com.kt.uptodo.utils.fakeTaskDetails
 import com.kt.uptodo.utils.fakeTasks
 import com.kt.uptodo.utils.padding
@@ -58,17 +59,17 @@ fun TaskDetailScreen(
     navController: NavHostController,
     viewModel: TaskDetailViewModel = hiltViewModel()
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .padding(LocalWindowInsets.current.asPaddingValues())
+            .padding(horizontal = MaterialTheme.padding.mediumSmall)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .align(Alignment.TopCenter)
                 .fillMaxWidth()
         ) {
             IconButton(
@@ -100,10 +101,12 @@ fun TaskDetailScreen(
             }
         }
 
+        Gap(height = MaterialTheme.padding.medium)
+
         Column(
             modifier = Modifier
-                .align(Alignment.Center)
                 .fillMaxWidth()
+                .weight(1f)
         ) {
             TaskDetailContent(taskDetail = fakeTaskDetails[1], subTask = fakeTaskDetails.take(2))
         }
@@ -116,11 +119,10 @@ fun TaskDetailScreen(
             ),
             onClick = {},
             modifier = Modifier
-                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
         ) {
             Text(
-                text = stringResource(R.string.action_edit_task),
+                text = stringResource(R.string.action_complete_task),
                 style = MaterialTheme.typography.labelMedium
             )
         }
@@ -172,7 +174,7 @@ private fun TaskDetailContent(
             subTask.fastForEach {
                 TaskItem(
                     taskDetail = it,
-                    onClick = { }
+                    modifier = Modifier.padding(start = MaterialTheme.padding.medium)
                 )
             }
         }
@@ -182,16 +184,18 @@ private fun TaskDetailContent(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.medium)
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.medium),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_delete),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onErrorContainer
+                    tint = MaterialTheme.colorScheme.error
                 )
                 Text(
                     text = stringResource(R.string.action_delete_task),
-                    color = MaterialTheme.colorScheme.onErrorContainer
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }

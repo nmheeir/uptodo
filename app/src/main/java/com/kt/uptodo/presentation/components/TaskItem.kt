@@ -38,7 +38,7 @@ import java.time.OffsetDateTime
 fun TaskItem(
     modifier: Modifier = Modifier,
     taskDetail: TaskDetail,
-    onClick: () -> Unit
+    onClick: (() -> Unit)? = null
 ) {
     var isChecked by remember { mutableStateOf(false) }
 
@@ -66,11 +66,11 @@ fun TaskItem(
     }
 
     Box(
-        modifier = Modifier
-            .clip(MaterialTheme.shapes.extraSmall)
-            .clickable {
-                onClick()
-            }
+        modifier = if (onClick != null) {
+            Modifier
+                .clip(MaterialTheme.shapes.small)
+                .clickable { onClick() }
+        } else Modifier.clip(MaterialTheme.shapes.small)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

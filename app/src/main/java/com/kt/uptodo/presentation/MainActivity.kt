@@ -97,7 +97,7 @@ class MainActivity : ComponentActivity() {
                             if (shouldShowNavigationBar) bottom += NavigationBarHeight
 
                             windowInsets
-                                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+                                .only(WindowInsetsSides.Horizontal)
                                 .add(WindowInsets(bottom = bottom, top = topInset))
                         }
 
