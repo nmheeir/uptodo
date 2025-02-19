@@ -7,16 +7,18 @@
     <string name="more">More</string>
 
     <string name="empty_description">What do you want to do today?</string>
+    <string name="ok">OK</string>
 
-    <!--Task Timer-->
+    <!--Label-->
     <string name="label_today">Today</string>
     <string name="label_complete">Complete</string>
     <string name="label_see_more">See more</string>
-    <string name="label_task_timer">Task Timer</string>
-    <string name="label_task_category">Task Category</string>
-    <string name="label_task_priority">Task Priority</string>
+    <string name="label_task_time">Time</string>
+    <string name="label_task_category">Category</string>
+    <string name="label_task_priority">Priority</string>
     <string name="label_sub_task">Sub Task</string>
     <string name="label_edit_task_title">Edit task title</string>
+    <string name="label_category_name">Category name</string>
 
     <!--Action-->
     <string name="action_add_task">Tap + to add your task</string>
@@ -25,4 +27,8 @@
     <string name="action_delete_task">Delete task</string>
     <string name="action_complete_task">Complete task</string>
     <string name="action_add_category">Add Category</string>
+    <string name="action_create_new_category">Create new category</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_next">Next</string>
+    <string name="action_back">Back</string>
 </resources>

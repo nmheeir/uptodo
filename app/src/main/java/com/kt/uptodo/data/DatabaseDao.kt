@@ -35,6 +35,13 @@ interface DatabaseDao {
     @Delete
     fun delete(category: CategoryEntity)
 
+    /*Query*/
+    @Query("SELECT * FROM tasks")
+    fun tasks(): List<TaskEntity>?
+
+    @Query("SELECT * FROM categories")
+    fun categories(): List<CategoryEntity>?
+
     /*Transaction*/
     @Transaction
     @Query("SELECT * FROM tasks")

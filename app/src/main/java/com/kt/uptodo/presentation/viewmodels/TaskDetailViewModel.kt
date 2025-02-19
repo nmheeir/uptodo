@@ -7,9 +7,11 @@ import com.kt.uptodo.data.enums.Priority
 import com.kt.uptodo.data.relations.TaskDetail
 import com.kt.uptodo.utils.fakeTaskDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import timber.log.Timber
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +23,9 @@ class TaskDetailViewModel @Inject constructor(
 
     val taskDetail = MutableStateFlow<TaskDetail?>(null)
     val subTask = MutableStateFlow<List<TaskDetail>>(emptyList())
+
+    private val _channel = Channel<ShowDialogEvent>()
+    val channel = _channel.receiveAsFlow()
 
     fun onAction(action: TaskDetailAction) {
         when (action) {
@@ -57,20 +62,25 @@ class TaskDetailViewModel @Inject constructor(
             it.task.parentTask == taskDetail.value!!.task.taskId
         }
     }
+
+    private fun deleteTask() {
+
+    }
 }
 
 
 sealed interface TaskDetailAction {
     data class UpdateTaskTitle(val title: String) : TaskDetailAction
-    data class UpdateTaskTime(val time: OffsetDateTime) : TaskDetailAction
+    data class UpdateTaskTime(val time: LocalDateTime) : TaskDetailAction
     data class UpdateTaskCategory(val category: CategoryEntity) : TaskDetailAction
     data class UpdateTaskPriority(val priority: Priority) : TaskDetailAction
     data class DeleteTask(val task: TaskDetail) : TaskDetailAction
 }
 
-sealed interface TaskDetailEvent {
-    data object ShowTaskTimeDialog : TaskDetailEvent
-    data object ShowTaskCategoryDialog : TaskDetailEvent
-    data object ShowTaskPriorityDialog : TaskDetailEvent
-    data object ShowAddSubTaskDialog : TaskDetailEvent
+sealed interface ShowDialogEvent {
+    data object ShowTaskTimeDialog : ShowDialogEvent
+    data object ShowTaskCategoryDialog : ShowDialogEvent
+    data object ShowTaskPriorityDialog : ShowDialogEvent
+    data object ShowAddSubTaskDialog : ShowDialogEvent
+    data object ShowDeleteTaskDialog : ShowDialogEvent
 }

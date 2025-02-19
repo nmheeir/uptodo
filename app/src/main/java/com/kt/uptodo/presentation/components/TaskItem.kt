@@ -32,6 +32,7 @@ import com.kt.uptodo.extensions.parseMinute
 import com.kt.uptodo.utils.Gap
 import com.kt.uptodo.utils.padding
 import java.time.Duration
+import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
 @Composable
@@ -42,7 +43,7 @@ fun TaskItem(
 ) {
     var isChecked by remember { mutableStateOf(false) }
 
-    val now = OffsetDateTime.now()
+    val now = LocalDateTime.now()
     val endDate = taskDetail.task.end
 
     val deadlineText = if (now.dayOfMonth == endDate.dayOfMonth) {

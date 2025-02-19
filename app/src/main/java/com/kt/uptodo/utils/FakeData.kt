@@ -6,7 +6,7 @@ import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.enums.Priority
 import com.kt.uptodo.data.relations.TaskDetail
 import com.kt.uptodo.extensions.toHex
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 val fakeTasks = listOf(
     TaskEntity(
@@ -16,11 +16,11 @@ val fakeTasks = listOf(
         title = "Mua sắm",
         description = "Mua rau và trái cây",
         priority = Priority.HIGH,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusHours(2)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusHours(2)
     ),
     TaskEntity(
         taskId = 2,
@@ -29,11 +29,11 @@ val fakeTasks = listOf(
         title = "Làm bài tập",
         description = "Hoàn thành bài tập toán",
         priority = Priority.MEDIUM,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = false,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusHours(3)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusHours(3)
     ),
     TaskEntity(
         taskId = 3,
@@ -42,11 +42,11 @@ val fakeTasks = listOf(
         title = "Dọn dẹp nhà",
         description = "Lau nhà và quét dọn",
         priority = Priority.LOW,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = true,
         isReminder = true,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusHours(1)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusHours(1)
     ),
     TaskEntity(
         taskId = 4,
@@ -55,11 +55,11 @@ val fakeTasks = listOf(
         title = "Chuẩn bị họp",
         description = "Chuẩn bị tài liệu cho cuộc họp",
         priority = Priority.HIGH,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusHours(4)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusHours(4)
     ),
     TaskEntity(
         taskId = 5,
@@ -68,11 +68,11 @@ val fakeTasks = listOf(
         title = "Tập thể dục",
         description = "Chạy bộ 30 phút",
         priority = Priority.MEDIUM,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = false,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusMinutes(30)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusMinutes(30)
     ),
     TaskEntity(
         taskId = 6,
@@ -81,11 +81,11 @@ val fakeTasks = listOf(
         title = "Viết báo cáo",
         description = "Hoàn thành báo cáo tuần",
         priority = Priority.HIGH,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusHours(5)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusHours(5)
     ),
     TaskEntity(
         taskId = 7,
@@ -94,11 +94,11 @@ val fakeTasks = listOf(
         title = "Đọc sách",
         description = "Đọc 10 trang sách",
         priority = Priority.LOW,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = false,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusHours(1)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusHours(1)
     ),
     TaskEntity(
         taskId = 8,
@@ -107,11 +107,11 @@ val fakeTasks = listOf(
         title = "Nấu ăn",
         description = "Chuẩn bị bữa tối",
         priority = Priority.MEDIUM,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = true,
         isReminder = false,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusHours(2)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusHours(2)
     ),
     TaskEntity(
         taskId = 9,
@@ -120,11 +120,11 @@ val fakeTasks = listOf(
         title = "Đi siêu thị",
         description = "Mua nguyên liệu cho bữa tối",
         priority = Priority.HIGH,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusHours(2)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusHours(2)
     ),
     TaskEntity(
         taskId = 10,
@@ -133,11 +133,11 @@ val fakeTasks = listOf(
         title = "Học lập trình",
         description = "Học Kotlin trong 1 giờ",
         priority = Priority.HIGH,
-        createdAt = OffsetDateTime.now(),
+        createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = OffsetDateTime.now(),
-        end = OffsetDateTime.now().plusHours(1)
+        start = LocalDateTime.now(),
+        end = LocalDateTime.now().plusHours(1)
     )
 )
 

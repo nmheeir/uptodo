@@ -3,7 +3,7 @@ package com.kt.uptodo.data.entities
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.kt.uptodo.data.enums.Priority
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 @Entity(tableName = "tasks")
 data class TaskEntity(
@@ -13,10 +13,10 @@ data class TaskEntity(
     val title: String,
     val description: String,
     val priority: Priority,
-    val createdAt: OffsetDateTime = OffsetDateTime.now(),
-    val updatedAt: OffsetDateTime? = null,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val updatedAt: LocalDateTime? = null,
     val isComplete: Boolean = false,
     val isReminder: Boolean,
-    val start: OffsetDateTime,
-    val end: OffsetDateTime
+    val start: LocalDateTime,
+    val end: LocalDateTime
 )

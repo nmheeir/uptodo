@@ -1,4 +1,4 @@
-package com.kt.uptodo.presentation
+package com.kt.uptodo.presentation.components.dialog
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,7 +22,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.CategoryEntity
-import com.kt.uptodo.presentation.components.ListDialog
 import com.kt.uptodo.utils.padding
 
 @Composable
@@ -33,7 +30,8 @@ fun CategoryDialog(
     categories: List<CategoryEntity>,
     selectedCategory: CategoryEntity,
     onValueSelected: (CategoryEntity) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onCreateNewCategory: () -> Unit
 ) {
     ListDialog(
         modifier = modifier,
@@ -74,13 +72,13 @@ fun CategoryDialog(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
-                onClick = {},
+                onClick = onCreateNewCategory,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = MaterialTheme.padding.mediumSmall)
             ) {
                 Text(
-                    text = stringResource(R.string.action_add_category),
+                    text = stringResource(R.string.action_create_new_category),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

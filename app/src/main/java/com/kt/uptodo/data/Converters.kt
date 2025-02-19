@@ -2,18 +2,19 @@ package com.kt.uptodo.data
 
 import androidx.room.TypeConverter
 import com.kt.uptodo.data.enums.Priority
+import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
 class Converters {
 
     @TypeConverter
-    fun offsetDataTimeToString(value: OffsetDateTime): String {
+    fun localDateTimeToString(value: LocalDateTime): String {
         return value.toString()
     }
 
     @TypeConverter
-    fun stringToOffsetDateTime(value: String): OffsetDateTime {
-        return OffsetDateTime.parse(value)
+    fun stringToLocalDateTime(value: String): LocalDateTime {
+        return LocalDateTime.parse(value)
     }
 
     @TypeConverter

@@ -41,6 +41,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.kt.uptodo.data.UptodoDatabase
 import com.kt.uptodo.presentation.navigation.Screens
 import com.kt.uptodo.presentation.navigation.navigationBuilder
 import com.kt.uptodo.presentation.theme.UpTodoTheme
@@ -48,9 +49,14 @@ import com.kt.uptodo.utils.Constants
 import com.kt.uptodo.utils.Constants.NavigationBarHeight
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var database: UptodoDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -102,7 +108,8 @@ class MainActivity : ComponentActivity() {
                         }
 
                     CompositionLocalProvider(
-                        LocalWindowInsets provides localWindowInset
+                        LocalWindowInsets provides localWindowInset,
+                        LocalDatabase provides database
                     ) {
                         NavHost(
                             navController = navController,
@@ -176,3 +183,5 @@ class MainActivity : ComponentActivity() {
 
 val LocalWindowInsets =
     compositionLocalOf<WindowInsets> { error("CompositionLocal LocalWindowInset not present") }
+val LocalDatabase =
+    compositionLocalOf<UptodoDatabase> { error("CompositionLocal LocalDatabase not present") }

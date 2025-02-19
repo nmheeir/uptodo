@@ -48,18 +48,22 @@ import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.relations.TaskDetail
 import com.kt.uptodo.extensions.convertToDeadline
-import com.kt.uptodo.presentation.CategoryDialog
 import com.kt.uptodo.presentation.LocalWindowInsets
 import com.kt.uptodo.presentation.components.TaskItem
-import com.kt.uptodo.presentation.components.TextFieldDialog
+import com.kt.uptodo.presentation.components.dialog.CategoryDialog
+import com.kt.uptodo.presentation.components.dialog.DefaultDialog
+import com.kt.uptodo.presentation.components.dialog.PriorityDialog
+import com.kt.uptodo.presentation.components.dialog.TaskTimeDialog
+import com.kt.uptodo.presentation.components.dialog.TextFieldDialog
 import com.kt.uptodo.presentation.theme.UpTodoTheme
 import com.kt.uptodo.presentation.viewmodels.TaskDetailAction
-import com.kt.uptodo.presentation.viewmodels.TaskDetailEvent
+import com.kt.uptodo.presentation.viewmodels.ShowDialogEvent
 import com.kt.uptodo.presentation.viewmodels.TaskDetailViewModel
 import com.kt.uptodo.utils.Gap
 import com.kt.uptodo.utils.fakeCategories
 import com.kt.uptodo.utils.fakeTaskDetails
 import com.kt.uptodo.utils.padding
+import java.time.LocalDateTime
 
 @Composable
 fun TaskDetailScreen(
@@ -76,9 +80,9 @@ fun TaskDetailScreen(
         else -> {
             TaskScreenContent(
                 navController = navController,
-                task = task!!,
+                taskDetail = task!!,
                 subTask = subTask,
-                action = viewModel::onAction
+                action = viewModel::onAction,
             )
         }
     }
@@ -88,15 +92,17 @@ fun TaskDetailScreen(
 private fun TaskScreenContent(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    task: TaskDetail,
+    taskDetail: TaskDetail,
     subTask: List<TaskDetail>,
-    action: (TaskDetailAction) -> Unit
+    action: (TaskDetailAction) -> Unit,
 ) {
+
     var showEditTaskTitleDialog by remember { mutableStateOf(false) }
     var showTaskTimeDialog by remember { mutableStateOf(false) }
     var showTaskCategoryDialog by remember { mutableStateOf(false) }
     var showTaskPriorityDialog by remember { mutableStateOf(false) }
     var showAddSubTaskDialog by remember { mutableStateOf(false) }
+    var showDeleteTaskDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -140,24 +146,28 @@ private fun TaskScreenContent(
                 .weight(1f)
         ) {
             TaskDetailContent(
-                taskDetail = task,
+                taskDetail = taskDetail,
                 subTask = subTask,
                 showDialog = {
                     when (it) {
-                        TaskDetailEvent.ShowAddSubTaskDialog -> {
+                        ShowDialogEvent.ShowAddSubTaskDialog -> {
                             showAddSubTaskDialog = true
                         }
 
-                        TaskDetailEvent.ShowTaskCategoryDialog -> {
+                        ShowDialogEvent.ShowTaskCategoryDialog -> {
                             showTaskCategoryDialog = true
                         }
 
-                        TaskDetailEvent.ShowTaskPriorityDialog -> {
+                        ShowDialogEvent.ShowTaskPriorityDialog -> {
                             showTaskPriorityDialog = true
                         }
 
-                        TaskDetailEvent.ShowTaskTimeDialog -> {
+                        ShowDialogEvent.ShowTaskTimeDialog -> {
                             showTaskTimeDialog = true
+                        }
+
+                        ShowDialogEvent.ShowDeleteTaskDialog -> {
+                            showDeleteTaskDialog = true
                         }
                     }
                 }
@@ -189,8 +199,8 @@ private fun TaskScreenContent(
                 )
             },
             initialTextFieldValue = TextFieldValue(
-                text = task.task.title,
-                selection = TextRange(task.task.title.length)
+                text = taskDetail.task.title,
+                selection = TextRange(taskDetail.task.title.length)
             ),
             onDone = {
                 action(TaskDetailAction.UpdateTaskTitle(it))
@@ -201,24 +211,66 @@ private fun TaskScreenContent(
     }
 
     if (showTaskTimeDialog) {
-
+        TaskTimeDialog(
+            taskDateTime = taskDetail.task.end,
+            onDismiss = { showTaskTimeDialog = false },
+            onTaskDateTimeChange = {
+                action(TaskDetailAction.UpdateTaskTime(it))
+            }
+        )
     }
 
     if (showTaskPriorityDialog) {
-
+        PriorityDialog(
+            selectedPriority = taskDetail.task.priority,
+            onValueSelected = {
+                action(TaskDetailAction.UpdateTaskPriority(it))
+                showTaskPriorityDialog = false
+            },
+            onDismiss = {
+                showTaskPriorityDialog = false
+            }
+        )
     }
+
     if (showAddSubTaskDialog) {
 
     }
+
     if (showTaskCategoryDialog) {
         CategoryDialog(
             categories = fakeCategories,
-            selectedCategory = task.category,
+            selectedCategory = taskDetail.category,
             onValueSelected = {
                 action(TaskDetailAction.UpdateTaskCategory(it))
             },
-            onDismiss = { showTaskCategoryDialog = false }
+            onDismiss = { showTaskCategoryDialog = false },
+            onCreateNewCategory = {
+                showTaskCategoryDialog = false
+                navController.navigate("create_new_category")
+            }
         )
+    }
+
+    if (showDeleteTaskDialog) {
+        DefaultDialog(
+            onDismiss = { showDeleteTaskDialog = false },
+            icon = {
+                Icon(painterResource(R.drawable.ic_delete), null)
+            },
+            buttons = {
+                TextButton(onClick = { showDeleteTaskDialog = false }) {
+                    Text(text = stringResource(android.R.string.cancel))
+                }
+                TextButton(
+                    onClick = { action(TaskDetailAction.DeleteTask(taskDetail)) }
+                ) {
+                    Text(text = stringResource(R.string.action_delete_task))
+                }
+            }
+        ) {
+
+        }
     }
 }
 
@@ -227,7 +279,7 @@ private fun TaskDetailContent(
     modifier: Modifier = Modifier,
     taskDetail: TaskDetail,
     subTask: List<TaskDetail>,
-    showDialog: (TaskDetailEvent) -> Unit
+    showDialog: (ShowDialogEvent) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
@@ -238,9 +290,9 @@ private fun TaskDetailContent(
 
         TaskDetailRow(
             icon = R.drawable.ic_timer,
-            title = stringResource(id = R.string.label_task_timer),
+            title = stringResource(id = R.string.label_task_time),
             content = taskDetail.task.end.convertToDeadline(),
-            onClick = { showDialog(TaskDetailEvent.ShowTaskTimeDialog) }
+            onClick = { showDialog(ShowDialogEvent.ShowTaskTimeDialog) }
         )
 
         TaskDetailRow(
@@ -251,21 +303,21 @@ private fun TaskDetailContent(
                 alpha = 0.32f
             ),
             contentColor = Color(android.graphics.Color.parseColor(taskDetail.category.color)),
-            onClick = { showDialog(TaskDetailEvent.ShowTaskCategoryDialog) }
+            onClick = { showDialog(ShowDialogEvent.ShowTaskCategoryDialog) }
         )
 
         TaskDetailRow(
             icon = R.drawable.ic_flag_2,
             title = stringResource(R.string.label_task_priority),
             content = taskDetail.task.priority.name,
-            onClick = { showDialog(TaskDetailEvent.ShowTaskPriorityDialog) }
+            onClick = { showDialog(ShowDialogEvent.ShowTaskPriorityDialog) }
         )
 
         TaskDetailRow(
             icon = R.drawable.ic_graph_1,
             title = stringResource(R.string.label_sub_task),
             content = stringResource(R.string.action_add_subtask),
-            onClick = { showDialog(TaskDetailEvent.ShowAddSubTaskDialog) }
+            onClick = { showDialog(ShowDialogEvent.ShowAddSubTaskDialog) }
         )
 
         if (subTask.isNotEmpty()) {

@@ -1,5 +1,6 @@
-package com.kt.uptodo.presentation.components
+package com.kt.uptodo.presentation.components.dialog
 
+import android.R
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -170,7 +171,7 @@ fun TextFieldDialog(
         title = title,
         buttons = {
             TextButton(onClick = onDismiss) {
-                Text(text = stringResource(android.R.string.cancel))
+                Text(text = stringResource(R.string.cancel))
             }
 
             TextButton(
@@ -180,7 +181,7 @@ fun TextFieldDialog(
                     onDone(textFieldValue.text)
                 }
             ) {
-                Text(text = stringResource(android.R.string.ok))
+                Text(text = stringResource(R.string.ok))
             }
         }
     ) {
