@@ -17,6 +17,5 @@ data class TaskEntity(
     val updatedAt: LocalDateTime? = null,
     val isComplete: Boolean = false,
     val isReminder: Boolean,
-    val start: LocalDateTime,
-    val end: LocalDateTime
+    val deadline: LocalDateTime
 )

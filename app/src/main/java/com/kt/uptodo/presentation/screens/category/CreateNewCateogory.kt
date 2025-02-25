@@ -33,7 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kt.uptodo.R
-import com.kt.uptodo.utils.categoryColors
+import com.kt.uptodo.utils.DefaultCategoryColors
 import com.kt.uptodo.utils.padding
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,13 +81,13 @@ fun CreateNewCategoryScreen() {
                 style = MaterialTheme.typography.labelMedium
             )
 
-            var selectedColor by remember { mutableStateOf(categoryColors[1]) }
+            var selectedColor by remember { mutableStateOf(DefaultCategoryColors[1]) }
             LazyRow(
                 state = lazyRowState,
                 horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small)
             ) {
                 items(
-                    items = categoryColors,
+                    items = DefaultCategoryColors,
                     key = { it.hashCode() }
                 ) {
                     Box(

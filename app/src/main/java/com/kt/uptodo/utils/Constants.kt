@@ -2,12 +2,13 @@ package com.kt.uptodo.utils
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.kt.uptodo.data.entities.CategoryEntity
 
 object Constants {
     val NavigationBarHeight = 80.dp
 }
 
-val categoryColors = listOf(
+val DefaultCategoryColors = listOf(
     Color(0xFFC9CC41),
     Color(0xFF66CC41),
     Color(0xFF41CCA7),

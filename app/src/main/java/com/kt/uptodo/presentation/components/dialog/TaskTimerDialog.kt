@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 
 @Composable
 fun TaskTimeDialog(
-    taskDateTime: LocalDateTime,
+    taskDateTime: LocalDateTime = LocalDateTime.now(),
     onDismiss: () -> Unit,
     onTaskDateTimeChange: (LocalDateTime) -> Unit
 ) {

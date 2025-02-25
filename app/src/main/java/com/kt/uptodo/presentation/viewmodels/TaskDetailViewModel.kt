@@ -40,7 +40,7 @@ class TaskDetailViewModel @Inject constructor(
 
             is TaskDetailAction.UpdateTaskTime -> {
                 taskDetail.value =
-                    taskDetail.value!!.copy(task = taskDetail.value!!.task.copy(end = action.time))
+                    taskDetail.value!!.copy(task = taskDetail.value!!.task.copy(deadline = action.time))
             }
 
             is TaskDetailAction.UpdateTaskTitle -> {

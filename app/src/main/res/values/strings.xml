@@ -19,6 +19,7 @@
     <string name="label_sub_task">Sub Task</string>
     <string name="label_edit_task_title">Edit task title</string>
     <string name="label_category_name">Category name</string>
+    <string name="label_add_task">Add Task</string>
 
     <!--Action-->
     <string name="action_add_task">Tap + to add your task</string>

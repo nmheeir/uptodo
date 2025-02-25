@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.kt.uptodo.presentation.screens.CalendarScreen
 import com.kt.uptodo.presentation.screens.FocusScreen
-import com.kt.uptodo.presentation.screens.IndexScreen
+import com.kt.uptodo.presentation.screens.index.IndexScreen
 import com.kt.uptodo.presentation.screens.MoreScreen
 import com.kt.uptodo.presentation.screens.TaskDetailScreen
 import com.kt.uptodo.presentation.screens.category.CreateNewCategoryScreen

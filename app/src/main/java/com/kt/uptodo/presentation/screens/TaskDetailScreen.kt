@@ -63,7 +63,6 @@ import com.kt.uptodo.utils.Gap
 import com.kt.uptodo.utils.fakeCategories
 import com.kt.uptodo.utils.fakeTaskDetails
 import com.kt.uptodo.utils.padding
-import java.time.LocalDateTime
 
 @Composable
 fun TaskDetailScreen(
@@ -72,31 +71,31 @@ fun TaskDetailScreen(
 ) {
     val task by viewModel.taskDetail.collectAsStateWithLifecycle()
     val subTask by viewModel.subTask.collectAsStateWithLifecycle()
-    when {
-        task == null -> {
-            EmptyScreen(R.string.empty_description)
-        }
 
-        else -> {
-            TaskScreenContent(
-                navController = navController,
-                taskDetail = task!!,
-                subTask = subTask,
-                action = viewModel::onAction,
-            )
-        }
+    Box(
+        contentAlignment = Alignment.TopStart,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(LocalWindowInsets.current.asPaddingValues())
+            .padding(horizontal = MaterialTheme.padding.mediumSmall)
+    ) {
+        TaskDetailScreenContent(
+            navController = navController,
+            taskDetail = task!!,
+            subTask = subTask,
+            action = viewModel::onAction,
+        )
     }
 }
 
 @Composable
-private fun TaskScreenContent(
+private fun TaskDetailScreenContent(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     taskDetail: TaskDetail,
     subTask: List<TaskDetail>,
     action: (TaskDetailAction) -> Unit,
 ) {
-
     var showEditTaskTitleDialog by remember { mutableStateOf(false) }
     var showTaskTimeDialog by remember { mutableStateOf(false) }
     var showTaskCategoryDialog by remember { mutableStateOf(false) }
@@ -108,8 +107,6 @@ private fun TaskScreenContent(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
-            .padding(LocalWindowInsets.current.asPaddingValues())
-            .padding(horizontal = MaterialTheme.padding.mediumSmall)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -212,7 +209,7 @@ private fun TaskScreenContent(
 
     if (showTaskTimeDialog) {
         TaskTimeDialog(
-            taskDateTime = taskDetail.task.end,
+            taskDateTime = taskDetail.task.deadline,
             onDismiss = { showTaskTimeDialog = false },
             onTaskDateTimeChange = {
                 action(TaskDetailAction.UpdateTaskTime(it))
@@ -291,7 +288,7 @@ private fun TaskDetailContent(
         TaskDetailRow(
             icon = R.drawable.ic_timer,
             title = stringResource(id = R.string.label_task_time),
-            content = taskDetail.task.end.convertToDeadline(),
+            content = taskDetail.task.deadline.convertToDeadline(),
             onClick = { showDialog(ShowDialogEvent.ShowTaskTimeDialog) }
         )
 

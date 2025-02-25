@@ -19,8 +19,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusHours(2)
+        deadline = LocalDateTime.now().plusHours(2)
     ),
     TaskEntity(
         taskId = 2,
@@ -32,8 +31,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = false,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusHours(3)
+        deadline = LocalDateTime.now().plusHours(3)
     ),
     TaskEntity(
         taskId = 3,
@@ -45,8 +43,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = true,
         isReminder = true,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusHours(1)
+        deadline = LocalDateTime.now().plusHours(1)
     ),
     TaskEntity(
         taskId = 4,
@@ -58,8 +55,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusHours(4)
+        deadline = LocalDateTime.now().plusHours(4)
     ),
     TaskEntity(
         taskId = 5,
@@ -71,8 +67,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = false,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusMinutes(30)
+        deadline = LocalDateTime.now().plusMinutes(30)
     ),
     TaskEntity(
         taskId = 6,
@@ -84,8 +79,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusHours(5)
+        deadline = LocalDateTime.now().plusHours(5)
     ),
     TaskEntity(
         taskId = 7,
@@ -97,8 +91,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = false,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusHours(1)
+        deadline = LocalDateTime.now().plusHours(1)
     ),
     TaskEntity(
         taskId = 8,
@@ -110,8 +103,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = true,
         isReminder = false,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusHours(2)
+        deadline = LocalDateTime.now().plusHours(2)
     ),
     TaskEntity(
         taskId = 9,
@@ -123,8 +115,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusHours(2)
+        deadline = LocalDateTime.now().plusHours(2)
     ),
     TaskEntity(
         taskId = 10,
@@ -136,8 +127,7 @@ val fakeTasks = listOf(
         createdAt = LocalDateTime.now(),
         isComplete = false,
         isReminder = true,
-        start = LocalDateTime.now(),
-        end = LocalDateTime.now().plusHours(1)
+        deadline = LocalDateTime.now().plusHours(1)
     )
 )
 

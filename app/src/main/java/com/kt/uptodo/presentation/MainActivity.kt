@@ -62,12 +62,9 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-
             UpTodoTheme {
                 val navController = rememberNavController()
-
                 val backStackEntry by navController.currentBackStackEntryAsState()
-
 
                 Box(
                     modifier = Modifier
@@ -94,7 +91,7 @@ class MainActivity : ComponentActivity() {
 
                     val navigationBarHeight by animateDpAsState(
                         targetValue = if (shouldShowNavigationBar) NavigationBarHeight else 0.dp,
-                        animationSpec = spring<Dp>(stiffness = Spring.StiffnessMedium)
+                        animationSpec = spring(stiffness = Spring.StiffnessMedium)
                     )
 
                     val localWindowInset =
@@ -103,8 +100,8 @@ class MainActivity : ComponentActivity() {
                             if (shouldShowNavigationBar) bottom += NavigationBarHeight
 
                             windowInsets
-                                .only(WindowInsetsSides.Horizontal)
-                                .add(WindowInsets(bottom = bottom, top = topInset))
+                                .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+                                .add(WindowInsets(bottom = bottom))
                         }
 
                     CompositionLocalProvider(

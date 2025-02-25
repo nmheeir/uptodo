@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e612d7be1860cb7783bb23eabdf349f3",
+    "identityHash": "cc6af49b1d8dca5fe6af0f43eb5d4688",
     "entities": [
       {
         "tableName": "tasks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`taskId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentTask` INTEGER, `categoryId` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `priority` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT, `isComplete` INTEGER NOT NULL, `isReminder` INTEGER NOT NULL, `start` TEXT NOT NULL, `end` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`taskId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentTask` INTEGER, `categoryId` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `priority` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT, `isComplete` INTEGER NOT NULL, `isReminder` INTEGER NOT NULL, `deadline` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "taskId",
@@ -69,14 +69,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "start",
-            "columnName": "start",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "end",
-            "columnName": "end",
+            "fieldPath": "deadline",
+            "columnName": "deadline",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -126,7 +120,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e612d7be1860cb7783bb23eabdf349f3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cc6af49b1d8dca5fe6af0f43eb5d4688')"
     ]
   }
 }
