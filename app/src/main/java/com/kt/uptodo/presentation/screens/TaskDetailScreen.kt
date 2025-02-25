@@ -56,11 +56,10 @@ import com.kt.uptodo.presentation.components.dialog.PriorityDialog
 import com.kt.uptodo.presentation.components.dialog.TaskTimeDialog
 import com.kt.uptodo.presentation.components.dialog.TextFieldDialog
 import com.kt.uptodo.presentation.theme.UpTodoTheme
-import com.kt.uptodo.presentation.viewmodels.TaskDetailAction
 import com.kt.uptodo.presentation.viewmodels.ShowDialogEvent
+import com.kt.uptodo.presentation.viewmodels.TaskDetailAction
 import com.kt.uptodo.presentation.viewmodels.TaskDetailViewModel
 import com.kt.uptodo.utils.Gap
-import com.kt.uptodo.utils.fakeCategories
 import com.kt.uptodo.utils.fakeTaskDetails
 import com.kt.uptodo.utils.padding
 
@@ -236,16 +235,11 @@ private fun TaskDetailScreenContent(
 
     if (showTaskCategoryDialog) {
         CategoryDialog(
-            categories = fakeCategories,
             selectedCategory = taskDetail.category,
             onValueSelected = {
                 action(TaskDetailAction.UpdateTaskCategory(it))
             },
             onDismiss = { showTaskCategoryDialog = false },
-            onCreateNewCategory = {
-                showTaskCategoryDialog = false
-                navController.navigate("create_new_category")
-            }
         )
     }
 

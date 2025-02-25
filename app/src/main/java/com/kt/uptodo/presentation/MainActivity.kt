@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAny
@@ -45,10 +44,8 @@ import com.kt.uptodo.data.UptodoDatabase
 import com.kt.uptodo.presentation.navigation.Screens
 import com.kt.uptodo.presentation.navigation.navigationBuilder
 import com.kt.uptodo.presentation.theme.UpTodoTheme
-import com.kt.uptodo.utils.Constants
 import com.kt.uptodo.utils.Constants.NavigationBarHeight
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint

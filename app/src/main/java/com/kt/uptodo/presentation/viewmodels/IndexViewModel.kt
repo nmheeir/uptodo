@@ -81,6 +81,7 @@ class IndexViewModel @Inject constructor(
 
     private suspend fun getTasks() {
 //        delay(1000)
+        database.task()
         uiState.value = uiState.value.copy(
             tasks = fakeTaskDetails
         )

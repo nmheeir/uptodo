@@ -10,7 +10,6 @@ import com.kt.uptodo.presentation.screens.FocusScreen
 import com.kt.uptodo.presentation.screens.index.IndexScreen
 import com.kt.uptodo.presentation.screens.MoreScreen
 import com.kt.uptodo.presentation.screens.TaskDetailScreen
-import com.kt.uptodo.presentation.screens.category.CreateNewCategoryScreen
 
 fun NavGraphBuilder.navigationBuilder(
     navController: NavHostController
@@ -46,11 +45,5 @@ fun NavGraphBuilder.navigationBuilder(
         )
     ) {
         TaskDetailScreen(navController)
-    }
-
-    composable(
-        route = "create_new_category"
-    ) {
-        CreateNewCategoryScreen()
     }
 }

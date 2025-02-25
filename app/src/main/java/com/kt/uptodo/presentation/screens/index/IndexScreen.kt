@@ -10,15 +10,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -27,15 +24,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,27 +40,21 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.kt.uptodo.R
-import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.presentation.LocalWindowInsets
 import com.kt.uptodo.presentation.components.TaskItem
 import com.kt.uptodo.presentation.components.dialog.CategoryDialog
 import com.kt.uptodo.presentation.components.dialog.PriorityDialog
 import com.kt.uptodo.presentation.components.dialog.TaskTimeDialog
-import com.kt.uptodo.presentation.viewmodels.IndexUi
 import com.kt.uptodo.presentation.viewmodels.IndexUiAction
 import com.kt.uptodo.presentation.viewmodels.IndexViewModel
 import com.kt.uptodo.utils.Constants
-import com.kt.uptodo.utils.fakeCategories
 import com.kt.uptodo.utils.padding
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -157,6 +144,7 @@ fun IndexScreen(
 
         if (showBottomSheet) {
             NewTaskBottomSheet(
+                navController = navController,
                 onDismiss = { showBottomSheet = false },
                 action = viewModel::onAction,
                 newTask = uiState.newTask
@@ -168,6 +156,7 @@ fun IndexScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NewTaskBottomSheet(
+    navController: NavHostController,
     onDismiss: () -> Unit,
     action: (IndexUiAction) -> Unit,
     newTask: TaskEntity
@@ -285,6 +274,16 @@ private fun NewTaskBottomSheet(
                 showTaskPriority = false
             },
             onDismiss = { showTaskPriority = false }
+        )
+    }
+
+    if (showTaskCategory) {
+        CategoryDialog(
+            onValueSelected = {
+                action(IndexUiAction.UpdateNewTaskCategory(it.categoryId))
+                showTaskCategory = false
+            },
+            onDismiss = { showTaskCategory = false }
         )
     }
 }

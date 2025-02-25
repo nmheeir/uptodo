@@ -16,38 +16,38 @@ interface DatabaseDao {
 
     /*Insert*/
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(task: TaskEntity)
+    suspend fun insert(task: TaskEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(category: CategoryEntity)
+    suspend fun insert(category: CategoryEntity)
 
     /*Update*/
     @Update
-    fun update(task: TaskEntity)
+    suspend fun update(task: TaskEntity)
 
     @Update
-    fun update(category: CategoryEntity)
+    suspend fun update(category: CategoryEntity)
 
     /*Delete*/
     @Delete
-    fun delete(task: TaskEntity)
+    suspend fun delete(task: TaskEntity)
 
     @Delete
-    fun delete(category: CategoryEntity)
+    suspend fun delete(category: CategoryEntity)
 
     /*Query*/
     @Query("SELECT * FROM tasks")
-    fun tasks(): List<TaskEntity>?
+    suspend fun tasks(): List<TaskEntity>?
 
     @Query("SELECT * FROM categories")
-    fun categories(): List<CategoryEntity>?
+    suspend fun categories(): List<CategoryEntity>?
 
     /*Transaction*/
     @Transaction
     @Query("SELECT * FROM tasks")
-    fun task(): List<TaskDetail>?
+    suspend fun task(): List<TaskDetail>?
 
     @Transaction
     @Query("SELECT * FROM tasks WHERE taskId = :taskId")
-    fun task(taskId: Long): TaskDetail?
+    suspend fun task(taskId: Long): TaskDetail?
 }
