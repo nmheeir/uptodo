@@ -144,7 +144,6 @@ fun IndexScreen(
 
         if (showBottomSheet) {
             NewTaskBottomSheet(
-                navController = navController,
                 onDismiss = { showBottomSheet = false },
                 action = viewModel::onAction,
                 newTask = uiState.newTask
@@ -156,7 +155,6 @@ fun IndexScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NewTaskBottomSheet(
-    navController: NavHostController,
     onDismiss: () -> Unit,
     action: (IndexUiAction) -> Unit,
     newTask: TaskEntity
@@ -177,8 +175,7 @@ private fun NewTaskBottomSheet(
         onDismissRequest = onDismiss,
         modifier = Modifier
             .padding(
-                bottom = WindowInsets.systemBars.asPaddingValues()
-                    .calculateBottomPadding() + Constants.NavigationBarHeight,
+                bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
             )
 
     ) {

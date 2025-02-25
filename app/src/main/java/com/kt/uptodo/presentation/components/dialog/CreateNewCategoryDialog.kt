@@ -1,6 +1,5 @@
-package com.kt.uptodo.presentation.screens.category
+package com.kt.uptodo.presentation.components.dialog
 
-import android.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +17,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,15 +31,12 @@ import androidx.compose.ui.unit.dp
 import com.kt.uptodo.R
 import com.kt.uptodo.extensions.toHex
 import com.kt.uptodo.presentation.LocalDatabase
-import com.kt.uptodo.presentation.components.dialog.DefaultDialog
 import com.kt.uptodo.utils.DefaultCategory
 import com.kt.uptodo.utils.DefaultCategoryColors
 import com.kt.uptodo.utils.padding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @Composable
 fun CreateNewCategoryDialog(

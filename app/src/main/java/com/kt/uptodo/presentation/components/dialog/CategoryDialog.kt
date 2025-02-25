@@ -29,7 +29,6 @@ import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.extensions.parseColor
 import com.kt.uptodo.presentation.LocalDatabase
-import com.kt.uptodo.presentation.screens.category.CreateNewCategoryDialog
 import com.kt.uptodo.utils.padding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
