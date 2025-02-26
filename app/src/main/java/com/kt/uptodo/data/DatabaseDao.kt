@@ -7,12 +7,14 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.kt.uptodo.data.entities.C_CREATED_AT
 import com.kt.uptodo.data.entities.C_PARENT_TASK
 import com.kt.uptodo.data.entities.C_TASK_ID
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.relations.TaskDetail
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDateTime
 
 @Dao
 interface DatabaseDao {
@@ -54,4 +56,8 @@ interface DatabaseDao {
     @Transaction
     @Query("SELECT * FROM tasks WHERE $C_PARENT_TASK = :parentTaskId")
     fun subTasks(parentTaskId: Long): Flow<List<TaskDetail>>
+
+    @Transaction
+    @Query("SELECT * FROM tasks WHERE $C_CREATED_AT = :createAt")
+    fun task(createAt: LocalDateTime): Flow<List<TaskDetail>>
 }

@@ -21,7 +21,7 @@ fun NavGraphBuilder.navigationBuilder(
     composable(
         route = Screens.Calendar.route
     ) {
-        CalendarScreen()
+        CalendarScreen(navController)
     }
 
     composable(
