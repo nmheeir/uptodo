@@ -13,10 +13,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,11 +24,9 @@ import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.enums.Priority
 import com.kt.uptodo.data.relations.TaskDetail
-import com.kt.uptodo.extensions.parseMinute
+import com.kt.uptodo.extensions.convertToDeadline
 import com.kt.uptodo.utils.Gap
 import com.kt.uptodo.utils.padding
-import java.time.Duration
-import java.time.LocalDateTime
 
 @Composable
 fun TaskItem(
@@ -40,31 +34,6 @@ fun TaskItem(
     taskDetail: TaskDetail,
     onClick: (() -> Unit)? = null
 ) {
-    var isChecked by remember { mutableStateOf(false) }
-
-    val now = LocalDateTime.now()
-    val endDate = taskDetail.task.deadline
-
-    val deadlineText = if (now.dayOfMonth == endDate.dayOfMonth) {
-        "Today at " + endDate.parseMinute()
-    } else {
-        val duration = Duration.between(now, endDate)
-        val minutesLeft = duration.toMinutes()
-        val hoursLeft = duration.toHours()
-        val daysLeft = duration.toDays()
-
-        when {
-            minutesLeft < 60 -> "Due in $minutesLeft minutes"
-            hoursLeft < 24 -> "Due in $hoursLeft hours"
-            daysLeft in 1..6 -> {
-                val remainingHours = hoursLeft % 24
-                "Due in $daysLeft days, $remainingHours hours"
-            }
-
-            else -> "Due in $daysLeft days"
-        }
-    }
-
     Box(
         modifier = if (onClick != null) {
             Modifier
@@ -99,7 +68,7 @@ fun TaskItem(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = deadlineText,
+                        text = taskDetail.task.deadline.convertToDeadline(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f)

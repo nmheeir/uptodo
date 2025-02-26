@@ -24,16 +24,10 @@ fun WheelTimePickerDialog(
     WheelTimePicker(
         modifier = Modifier.fillMaxWidth(),
         startTime = time,
-        timeFormat = TimeFormat.AM_PM,
+        timeFormat = TimeFormat.HOUR_24,
         onSnappedTime = { newTime ->
             time = newTime
             onTaskTimeChange(newTime)
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun Test() {
-    WheelTimePickerDialog(LocalTime.now()) { }
 }
