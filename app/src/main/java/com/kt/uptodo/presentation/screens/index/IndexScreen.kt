@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -50,13 +51,12 @@ import com.kt.uptodo.presentation.components.TaskItem
 import com.kt.uptodo.presentation.components.dialog.CategoryDialog
 import com.kt.uptodo.presentation.components.dialog.PriorityDialog
 import com.kt.uptodo.presentation.components.dialog.TaskTimeDialog
+import com.kt.uptodo.presentation.navigation.Screens
 import com.kt.uptodo.presentation.viewmodels.IndexUiAction
 import com.kt.uptodo.presentation.viewmodels.IndexViewModel
-import com.kt.uptodo.utils.Constants
 import com.kt.uptodo.utils.padding
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IndexScreen(
     navController: NavHostController,
@@ -64,8 +64,8 @@ fun IndexScreen(
 ) {
     val lazyListState = rememberLazyListState()
 
-    val tasksDetail by viewModel.taskDetails.collectAsStateWithLifecycle()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val allTasks by viewModel.allTasks.collectAsStateWithLifecycle()
+    val newTask by viewModel.newTask.collectAsStateWithLifecycle()
 
     Box(
         modifier = Modifier
@@ -80,13 +80,13 @@ fun IndexScreen(
                 .padding(horizontal = MaterialTheme.padding.mediumSmall)
         ) {
             item {
-                if (uiState.tasks.isEmpty()) {
+                if (allTasks.isEmpty()) {
                     Text(
                         text = "is empty"
                     )
                 }
             }
-            uiState.tasks.takeIf { it.isNotEmpty() }?.let {
+            allTasks.takeIf { it.isNotEmpty() }?.let { tasks ->
                 item {
                     Text(
                         text = stringResource(R.string.label_today),
@@ -103,7 +103,7 @@ fun IndexScreen(
                 }
 
                 items(
-                    items = uiState.tasks,
+                    items = tasks,
                     key = { it.hashCode() }
                 ) { taskDetail ->
                     TaskItem(
@@ -138,6 +138,7 @@ fun IndexScreen(
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
+                .padding(MaterialTheme.padding.mediumSmall)
         ) {
             Icon(painterResource(R.drawable.ic_add_box), null)
         }
@@ -146,7 +147,7 @@ fun IndexScreen(
             NewTaskBottomSheet(
                 onDismiss = { showBottomSheet = false },
                 action = viewModel::onAction,
-                newTask = uiState.newTask
+                newTask = newTask
             )
         }
     }
@@ -159,8 +160,8 @@ private fun NewTaskBottomSheet(
     action: (IndexUiAction) -> Unit,
     newTask: TaskEntity
 ) {
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+    val (focus1, focus2) = remember { FocusRequester.createRefs() }
 
     var showTaskTime by remember { mutableStateOf(false) }
     var showTaskPriority by remember { mutableStateOf(false) }
@@ -168,7 +169,7 @@ private fun NewTaskBottomSheet(
 
     LaunchedEffect(Unit) {
         delay(300)
-        focusRequester.requestFocus()
+        focus2.requestFocus()
     }
 
     ModalBottomSheet(
@@ -184,19 +185,17 @@ private fun NewTaskBottomSheet(
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.mediumSmall),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    start = MaterialTheme.padding.mediumSmall
-                )
+                .padding(MaterialTheme.padding.mediumSmall)
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = {
-                            focusManager.clearFocus()
                         }
                     )
                 }
         ) {
             Text(
-                text = "Add task"
+                text = "Add task",
+                style = MaterialTheme.typography.labelLarge
             )
 
             val (title, onTitleChange) = remember { mutableStateOf(newTask.title) }
@@ -207,11 +206,34 @@ private fun NewTaskBottomSheet(
                     action(IndexUiAction.UpdateNewTaskTitle(it))
                 },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = { focus2.requestFocus() }
+                ),
                 modifier = Modifier
-                    .focusRequester(focusRequester)
+                    .fillMaxWidth()
+                    .focusRequester(focus1)
             )
 
+            val (description, onDescriptionChange) = remember { mutableStateOf(newTask.description) }
+            OutlinedTextField(
+                value = description,
+                onValueChange = {
+                    onDescriptionChange(it)
+                    action(IndexUiAction.UpdateNewTaskTitle(it))
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focus2)
+
+            )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -244,7 +266,10 @@ private fun NewTaskBottomSheet(
                 }
 
                 IconButton(
-                    onClick = {}
+                    onClick = {
+//                        action(IndexUiAction.CreateNewTask)
+                        onDismiss()
+                    }
                 ) {
                     Icon(painterResource(R.drawable.ic_send), null)
                 }

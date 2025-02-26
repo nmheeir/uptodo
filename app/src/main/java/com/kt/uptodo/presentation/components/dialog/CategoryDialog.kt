@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.extensions.parseColor
@@ -41,22 +43,15 @@ fun CategoryDialog(
     onDismiss: () -> Unit,
 ) {
     val database = LocalDatabase.current
-    var categories: List<CategoryEntity>? by remember {
-        mutableStateOf(null)
-    }
-    var showCreateNewCategory by remember { mutableStateOf(false) }
+    val categories by database.categories().collectAsState(emptyList())
 
-    LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) {
-            categories = database.categories()
-        }
-    }
+    var showCreateNewCategory by remember { mutableStateOf(false) }
 
     ListDialog(
         modifier = modifier,
         onDismiss = onDismiss
     ) {
-        if (categories.isNullOrEmpty()) {
+        if (categories.isEmpty()) {
             item {
                 Text(
                     text = "akdf",
@@ -64,7 +59,7 @@ fun CategoryDialog(
                 )
             }
         }
-        categories.takeIf { !it.isNullOrEmpty() }?.let { c ->
+        categories.takeIf { it.isNotEmpty() }?.let { c ->
             items(
                 items = c,
                 key = { it.hashCode() }

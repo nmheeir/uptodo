@@ -3,7 +3,11 @@ package com.kt.uptodo.utils
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kt.uptodo.data.entities.CategoryEntity
+import com.kt.uptodo.data.entities.TaskEntity
+import com.kt.uptodo.data.enums.Priority
+import com.kt.uptodo.data.relations.TaskDetail
 import com.kt.uptodo.extensions.toHex
+import java.time.LocalDateTime
 
 object Constants {
     val NavigationBarHeight = 80.dp
@@ -27,4 +31,18 @@ val DefaultCategory = CategoryEntity(
     categoryId = 0,
     name = "",
     color = DefaultCategoryColors[0].toHex()
+)
+
+val DefaultTask = TaskEntity(
+    categoryId = 0,
+    title = "",
+    description = "",
+    priority = Priority.LOW,
+    deadline = LocalDateTime.now(),
+    isReminder = false
+)
+
+val DefaultTaskDetail = TaskDetail(
+    task = DefaultTask,
+    category = DefaultCategory
 )

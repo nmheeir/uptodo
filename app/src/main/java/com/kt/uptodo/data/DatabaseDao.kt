@@ -10,6 +10,7 @@ import androidx.room.Update
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.relations.TaskDetail
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DatabaseDao {
@@ -36,16 +37,13 @@ interface DatabaseDao {
     suspend fun delete(category: CategoryEntity)
 
     /*Query*/
-    @Query("SELECT * FROM tasks")
-    suspend fun tasks(): List<TaskEntity>?
-
     @Query("SELECT * FROM categories")
-    suspend fun categories(): List<CategoryEntity>?
+    fun categories(): Flow<List<CategoryEntity>>
 
     /*Transaction*/
     @Transaction
     @Query("SELECT * FROM tasks")
-    suspend fun task(): List<TaskDetail>?
+    fun task(): Flow<List<TaskDetail>>
 
     @Transaction
     @Query("SELECT * FROM tasks WHERE taskId = :taskId")
