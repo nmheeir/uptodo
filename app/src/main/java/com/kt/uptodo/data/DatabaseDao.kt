@@ -7,6 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.kt.uptodo.data.entities.C_PARENT_TASK
+import com.kt.uptodo.data.entities.C_TASK_ID
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.relations.TaskDetail
@@ -46,6 +48,10 @@ interface DatabaseDao {
     fun task(): Flow<List<TaskDetail>>
 
     @Transaction
-    @Query("SELECT * FROM tasks WHERE taskId = :taskId")
+    @Query("SELECT * FROM tasks WHERE $C_TASK_ID = :taskId")
     suspend fun task(taskId: Long): TaskDetail?
+
+    @Transaction
+    @Query("SELECT * FROM tasks WHERE $C_PARENT_TASK = :parentTaskId")
+    fun subTasks(parentTaskId: Long): Flow<List<TaskDetail>>
 }

@@ -18,5 +18,19 @@ val roomCallback = object : RoomDatabase.Callback() {
             END;
             """
         )
+
+        //Đặt lại parentTask (của task con) = null  nếu parentTask bị xóa
+/*        db.execSQL(
+            """
+                            CREATE TRIGGER IF NOT EXISTS update_child_tasks
+                            AFTER DELETE ON $TABLE_TASK
+                            FOR EACH ROW
+                            BEGIN
+                                UPDATE $TABLE_TASK
+                                SET $C_PARENT_TASK = NULL
+                                WHERE $C_PARENT_TASK = OLD.$C_TASK_ID;
+                            END;
+                            """.trimIndent()
+        )*/
     }
 }

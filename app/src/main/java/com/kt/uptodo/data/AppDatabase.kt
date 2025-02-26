@@ -51,7 +51,7 @@ abstract class InternalDatabase : RoomDatabase() {
         fun newInstance(context: Context) =
             UptodoDatabase(
                 delegate = Room.databaseBuilder(context, InternalDatabase::class.java, DB_NAME)
-                    .addCallback(roomCallback)
+//                    .addCallback(roomCallback)
                     .fallbackToDestructiveMigration()
                     .build()
             )

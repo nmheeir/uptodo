@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,19 +25,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.extensions.parseColor
 import com.kt.uptodo.presentation.LocalDatabase
 import com.kt.uptodo.utils.padding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun CategoryDialog(
     modifier: Modifier = Modifier,
-    selectedCategory: CategoryEntity? = null,
+    selectedCategoryId: Long? = null,
     onValueSelected: (CategoryEntity) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -54,8 +50,8 @@ fun CategoryDialog(
         if (categories.isEmpty()) {
             item {
                 Text(
-                    text = "akdf",
-                    style = MaterialTheme.typography.bodySmall
+                    text = "No category yet",
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }
@@ -70,7 +66,7 @@ fun CategoryDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            if (selectedCategory == category) MaterialTheme.colorScheme.inverseOnSurface
+                            if (selectedCategoryId == category.categoryId) MaterialTheme.colorScheme.inverseOnSurface
                             else Color.Transparent
                         )
                         .clickable {

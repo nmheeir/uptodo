@@ -49,16 +49,20 @@ import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.relations.TaskDetail
 import com.kt.uptodo.extensions.convertToDeadline
 import com.kt.uptodo.presentation.LocalWindowInsets
+import com.kt.uptodo.presentation.components.NewTaskBottomSheet
 import com.kt.uptodo.presentation.components.TaskItem
 import com.kt.uptodo.presentation.components.dialog.CategoryDialog
 import com.kt.uptodo.presentation.components.dialog.DefaultDialog
 import com.kt.uptodo.presentation.components.dialog.PriorityDialog
 import com.kt.uptodo.presentation.components.dialog.TaskTimeDialog
 import com.kt.uptodo.presentation.components.dialog.TextFieldDialog
+import com.kt.uptodo.presentation.shared.NewTaskSheetUiAction
+import com.kt.uptodo.presentation.shared.NewTaskViewModel
 import com.kt.uptodo.presentation.theme.UpTodoTheme
 import com.kt.uptodo.presentation.viewmodels.ShowDialogEvent
 import com.kt.uptodo.presentation.viewmodels.TaskDetailAction
 import com.kt.uptodo.presentation.viewmodels.TaskDetailViewModel
+import com.kt.uptodo.utils.DefaultTask
 import com.kt.uptodo.utils.Gap
 import com.kt.uptodo.utils.fakeTaskDetails
 import com.kt.uptodo.utils.padding
@@ -66,10 +70,12 @@ import com.kt.uptodo.utils.padding
 @Composable
 fun TaskDetailScreen(
     navController: NavHostController,
-    viewModel: TaskDetailViewModel = hiltViewModel()
+    viewModel: TaskDetailViewModel = hiltViewModel(),
+    newTaskViewModel: NewTaskViewModel = hiltViewModel()
 ) {
     val task by viewModel.taskDetail.collectAsStateWithLifecycle()
     val subTask by viewModel.subTask.collectAsStateWithLifecycle()
+    val newTask by newTaskViewModel.newTask.collectAsStateWithLifecycle()
 
     Box(
         contentAlignment = Alignment.TopStart,
@@ -78,12 +84,20 @@ fun TaskDetailScreen(
             .padding(LocalWindowInsets.current.asPaddingValues())
             .padding(horizontal = MaterialTheme.padding.mediumSmall)
     ) {
-        TaskDetailScreenContent(
-            navController = navController,
-            taskDetail = task!!,
-            subTask = subTask,
-            action = viewModel::onAction,
-        )
+        if (task == null) {
+            Text(
+                text = "null"
+            )
+        } else {
+            TaskDetailScreenContent(
+                navController = navController,
+                taskDetail = task!!,
+                newTask = newTask,
+                subTask = subTask,
+                action = viewModel::onAction,
+                newTaskAction = newTaskViewModel::onAction
+            )
+        }
     }
 }
 
@@ -92,8 +106,10 @@ private fun TaskDetailScreenContent(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     taskDetail: TaskDetail,
+    newTask: TaskEntity,
     subTask: List<TaskDetail>,
     action: (TaskDetailAction) -> Unit,
+    newTaskAction: (NewTaskSheetUiAction) -> Unit
 ) {
     var showEditTaskTitleDialog by remember { mutableStateOf(false) }
     var showTaskTimeDialog by remember { mutableStateOf(false) }
@@ -230,12 +246,16 @@ private fun TaskDetailScreenContent(
     }
 
     if (showAddSubTaskDialog) {
-
+        NewTaskBottomSheet(
+            onDismiss = { showAddSubTaskDialog = false },
+            action = newTaskAction,
+            newTask = newTask
+        )
     }
 
     if (showTaskCategoryDialog) {
         CategoryDialog(
-            selectedCategory = taskDetail.category,
+            selectedCategoryId = taskDetail.category.categoryId,
             onValueSelected = {
                 action(TaskDetailAction.UpdateTaskCategory(it))
             },

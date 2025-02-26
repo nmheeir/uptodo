@@ -2,27 +2,27 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "cc6af49b1d8dca5fe6af0f43eb5d4688",
+    "identityHash": "6260bdbce8e569ade6ad63fbf54f26ea",
     "entities": [
       {
         "tableName": "tasks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`taskId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentTask` INTEGER, `categoryId` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `priority` TEXT NOT NULL, `createdAt` TEXT NOT NULL, `updatedAt` TEXT, `isComplete` INTEGER NOT NULL, `isReminder` INTEGER NOT NULL, `deadline` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`task_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parent_task` INTEGER, `category_id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `priority` TEXT NOT NULL, `created_at` TEXT NOT NULL, `updated_at` TEXT, `is_complete` INTEGER NOT NULL, `is_reminder` INTEGER NOT NULL, `deadline` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "taskId",
-            "columnName": "taskId",
+            "columnName": "task_id",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
             "fieldPath": "parentTask",
-            "columnName": "parentTask",
+            "columnName": "parent_task",
             "affinity": "INTEGER",
             "notNull": false
           },
           {
             "fieldPath": "categoryId",
-            "columnName": "categoryId",
+            "columnName": "category_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -46,25 +46,25 @@
           },
           {
             "fieldPath": "createdAt",
-            "columnName": "createdAt",
+            "columnName": "created_at",
             "affinity": "TEXT",
             "notNull": true
           },
           {
             "fieldPath": "updatedAt",
-            "columnName": "updatedAt",
+            "columnName": "updated_at",
             "affinity": "TEXT",
             "notNull": false
           },
           {
             "fieldPath": "isComplete",
-            "columnName": "isComplete",
+            "columnName": "is_complete",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
             "fieldPath": "isReminder",
-            "columnName": "isReminder",
+            "columnName": "is_reminder",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -78,7 +78,7 @@
         "primaryKey": {
           "autoGenerate": true,
           "columnNames": [
-            "taskId"
+            "task_id"
           ]
         },
         "indices": [],
@@ -120,7 +120,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cc6af49b1d8dca5fe6af0f43eb5d4688')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6260bdbce8e569ade6ad63fbf54f26ea')"
     ]
   }
 }

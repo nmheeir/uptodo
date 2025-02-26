@@ -2,27 +2,36 @@ package com.kt.uptodo.presentation.viewmodels
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kt.uptodo.data.UptodoDatabase
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.enums.Priority
 import com.kt.uptodo.data.relations.TaskDetail
+import com.kt.uptodo.presentation.shared.NewTaskSheetUiAction
 import com.kt.uptodo.utils.fakeTaskDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class TaskDetailViewModel @Inject constructor(
+    private val database: UptodoDatabase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val taskId: Long = savedStateHandle.get<Long>("taskId")!!
 
     val taskDetail = MutableStateFlow<TaskDetail?>(null)
-    val subTask = MutableStateFlow<List<TaskDetail>>(emptyList())
+    val subTask = database.subTasks(taskId)
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     private val _channel = Channel<ShowDialogEvent>()
     val channel = _channel.receiveAsFlow()
@@ -49,25 +58,24 @@ class TaskDetailViewModel @Inject constructor(
             }
 
             is TaskDetailAction.DeleteTask -> {
+                deleteTask()
             }
         }
     }
 
     init {
         Timber.d(taskId.toString())
-        taskDetail.value = fakeTaskDetails.find {
-            it.task.taskId == taskId
-        }
-        subTask.value = fakeTaskDetails.filter {
-            it.task.parentTask == taskDetail.value!!.task.taskId
+        viewModelScope.launch {
+            taskDetail.value = database.task(taskId)
         }
     }
 
     private fun deleteTask() {
-
+        viewModelScope.launch {
+//            database.delete()
+        }
     }
 }
-
 
 sealed interface TaskDetailAction {
     data class UpdateTaskTitle(val title: String) : TaskDetailAction
