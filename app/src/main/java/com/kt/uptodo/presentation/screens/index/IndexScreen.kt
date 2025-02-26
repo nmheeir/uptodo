@@ -103,67 +103,12 @@ fun IndexScreen(
                         task.hashCode()
                     }
                 ) { index, task ->
-                    var showDeleteTaskDialog by remember { mutableStateOf(false) }
-                    val dismissState = rememberSwipeToDismissBoxState(
-                        positionalThreshold = { totalDistance ->
-                            totalDistance * 0.9f
-                        },
-                        confirmValueChange = { dismissValue ->
-                            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                                Timber.d(dismissValue.toString())
-                                showDeleteTaskDialog = true
-                            }
-                            true
+                    TaskItem(
+                        taskDetail = task,
+                        onClick = {
+                            navController.navigate("task_detail/${task.task.taskId}")
                         }
                     )
-
-                    SwipeToDismissBox(
-                        modifier = Modifier.matchParentSize(),
-                        state = dismissState,
-                        backgroundContent = {
-                            SwipeBackground(
-                                dismissState = dismissState,
-                                endIcon = R.drawable.ic_delete
-                            )
-                        },
-                        enableDismissFromStartToEnd = false
-                    ) {
-                        TaskItem(
-                            taskDetail = task,
-                            onClick = {
-                                navController.navigate("task_detail/${task.task.taskId}")
-                            }
-                        )
-
-                        if (showDeleteTaskDialog) {
-                            DefaultDialog(
-                                onDismiss = { showDeleteTaskDialog = false },
-                                buttons = {
-                                    TextButton(
-                                        onClick = {
-                                            scope.launch {
-                                                dismissState.reset()
-                                            }
-                                            showDeleteTaskDialog = false
-                                        }
-                                    ) {
-                                        Text(text = stringResource(R.string.action_cancel))
-                                    }
-                                    TextButton(
-                                        onClick = {
-                                            scope.launch(Dispatchers.IO) {
-                                                database.delete(task.task)
-                                            }
-                                        }
-                                    ) {
-                                        Text(text = stringResource(R.string.ok))
-                                    }
-                                }
-                            ) {
-                                Text(text = "Do you want to delete this task ?")
-                            }
-                        }
-                    }
                 }
 
                 item {
