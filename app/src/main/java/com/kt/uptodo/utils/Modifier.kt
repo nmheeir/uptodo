@@ -9,6 +9,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 
+const val DISABLED_ALPHA = .38f
 const val SECONDARY_ALPHA = 0.78f
 fun Modifier.secondaryItemAlpha(): Modifier = this.alpha(SECONDARY_ALPHA)
 
