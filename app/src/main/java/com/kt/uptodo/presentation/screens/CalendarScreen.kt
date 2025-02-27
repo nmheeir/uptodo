@@ -17,18 +17,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
+import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.WeekDayPosition
+import com.kizitonwose.calendar.core.atStartOfMonth
 import com.kizitonwose.calendar.core.daysOfWeek
 import com.kizitonwose.calendar.core.nextMonth
 import com.kizitonwose.calendar.core.previousMonth
 import com.kizitonwose.calendar.core.yearMonth
 import com.kt.uptodo.presentation.LocalWindowInsets
+import com.kt.uptodo.presentation.components.calendar.CalendarHeader
 import com.kt.uptodo.presentation.components.calendar.CalendarTitle
 import com.kt.uptodo.presentation.components.calendar.Day
 import com.kt.uptodo.presentation.viewmodels.CalendarViewModel
 import com.kt.uptodo.utils.rememberFirstMostVisibleMonth
+import com.kt.uptodo.utils.rememberFirstVisibleWeekAfterScroll
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -60,14 +64,7 @@ private fun CalendarTopBar() {
     val startMonth = remember { currentMonth.minusMonths(100) }
     val endMonth = remember { currentMonth.plusMonths(100) }
     val daysOfWeek = remember { daysOfWeek() }
-    var selection by remember {
-        mutableStateOf(
-            CalendarDay(
-                date = currentDate,
-                position = DayPosition.MonthDate
-            )
-        )
-    }
+    var selection: LocalDate by remember { mutableStateOf(LocalDate.now()) }
 
     val state = rememberCalendarState(
         startMonth = startMonth,
@@ -75,33 +72,47 @@ private fun CalendarTopBar() {
         firstVisibleMonth = currentMonth,
         firstDayOfWeek = daysOfWeek.first()
     )
+    val weekState = rememberWeekCalendarState(
+        startDate = startMonth.atStartOfMonth(),
+        endDate = endMonth.atEndOfMonth(),
+        firstVisibleWeekDate = currentDate,
+        firstDayOfWeek = daysOfWeek.first(),
+    )
+
     val coroutineScope = rememberCoroutineScope()
-    val visibleMonth = rememberFirstMostVisibleMonth(state, viewportPercent = 90f)
+    val visibleWeek = rememberFirstVisibleWeekAfterScroll(weekState)
 
     Column {
         CalendarTitle(
             modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp),
-            currentMonth = visibleMonth.yearMonth,
+            currentMonth = visibleWeek.days.first().date.yearMonth,
             goToPrevious = {
                 coroutineScope.launch {
-                    state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.previousMonth)
+                    val targetDate = weekState.firstVisibleWeek.days.first().date.minusDays(1)
+                    weekState.animateScrollToWeek(targetDate)
                 }
             },
             goToNext = {
                 coroutineScope.launch {
-                    state.animateScrollToMonth(state.firstVisibleMonth.yearMonth.nextMonth)
+                    val targetDate = weekState.firstVisibleWeek.days.last().date.plusDays(1)
+                    weekState.animateScrollToWeek(targetDate)
                 }
             },
         )
 
+        CalendarHeader(daysOfWeek)
+
         WeekCalendar(
+            state = weekState,
             dayContent = { day ->
                 val isSelectable = day.position == WeekDayPosition.RangeDate
                 Day(
                     day = day.date,
-                    isSelected = selection.date == day.date,
+                    isSelected = selection == day.date,
                     isSelectable = isSelectable,
-                    onClick = { }
+                    onClick = {
+                        selection = it
+                    }
                 )
             }
         )

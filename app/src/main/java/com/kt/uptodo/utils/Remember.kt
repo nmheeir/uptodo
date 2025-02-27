@@ -7,7 +7,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import com.kizitonwose.calendar.compose.CalendarLayoutInfo
 import com.kizitonwose.calendar.compose.CalendarState
+import com.kizitonwose.calendar.compose.weekcalendar.WeekCalendarState
 import com.kizitonwose.calendar.core.CalendarMonth
+import com.kizitonwose.calendar.core.Week
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 
@@ -49,4 +51,18 @@ private fun CalendarLayoutInfo.firstMostVisibleMonth(viewportPercent: Float = 50
             }
         }?.month
     }
+}
+
+/**
+ * Find first visible week in a paged week calendar **after** scrolling stops.
+ */
+@Composable
+fun rememberFirstVisibleWeekAfterScroll(state: WeekCalendarState): Week {
+    val visibleWeek = remember(state) { mutableStateOf(state.firstVisibleWeek) }
+    LaunchedEffect(state) {
+        snapshotFlow { state.isScrollInProgress }
+            .filter { scrolling -> !scrolling }
+            .collect { visibleWeek.value = state.firstVisibleWeek }
+    }
+    return visibleWeek.value
 }
