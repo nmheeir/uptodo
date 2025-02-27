@@ -83,8 +83,8 @@ interface DatabaseDao {
                 AND (:isComplete IS NULL OR $C_IS_COMPLETE = :isComplete)
                 AND (:isReminder IS NULL OR $C_IS_REMINDER = :isReminder)
                 AND (:createdAt IS NULL OR DATE($C_CREATED_AT) = DATE(:createdAt))
-                AND (:updatedAt IS NULL OR $C_UPDATED_AT = :updatedAt)
-                AND (:deadline IS NULL OR $C_DEADLINE = :deadline)
+                AND (:updatedAt IS NULL OR DATE($C_UPDATED_AT) = DATE(:updatedAt))
+                AND (:deadline IS NULL OR DATE($C_DEADLINE) = DATE(:deadline))
         """
     )
     fun getTasks(

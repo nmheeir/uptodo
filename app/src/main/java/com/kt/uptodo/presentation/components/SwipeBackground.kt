@@ -30,31 +30,18 @@ fun SwipeBackground(
     @DrawableRes endIcon: Int? = null
 ) {
 
-    val color = when (dismissState.dismissDirection) {
-        SwipeToDismissBoxValue.StartToEnd -> {
-            MaterialTheme.colorScheme.primaryContainer
-        }
+    val targetValue = dismissState.targetValue
 
-        SwipeToDismissBoxValue.EndToStart -> {
-            MaterialTheme.colorScheme.secondaryContainer
-        }
-
-        SwipeToDismissBoxValue.Settled -> {
-            MaterialTheme.colorScheme.tertiaryContainer
-        }
+    val color = when (targetValue) {
+        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
+        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.tertiaryContainer
+        SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.secondaryContainer
     }
-    val contentColor = when (dismissState.dismissDirection) {
-        SwipeToDismissBoxValue.StartToEnd -> {
-            MaterialTheme.colorScheme.onPrimaryContainer
-        }
 
-        SwipeToDismissBoxValue.EndToStart -> {
-            MaterialTheme.colorScheme.onSecondaryContainer
-        }
-
-        SwipeToDismissBoxValue.Settled -> {
-            MaterialTheme.colorScheme.onTertiaryContainer
-        }
+    val contentColor = when (targetValue) {
+        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.onPrimaryContainer
+        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.onTertiaryContainer
+        SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.onSecondaryContainer
     }
 
     Box(

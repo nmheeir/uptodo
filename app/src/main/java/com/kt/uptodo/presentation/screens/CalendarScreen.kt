@@ -5,7 +5,9 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,9 +59,11 @@ import com.kt.uptodo.presentation.components.calendar.Day
 import com.kt.uptodo.presentation.theme.UpTodoTheme
 import com.kt.uptodo.presentation.viewmodels.CalendarUiAction
 import com.kt.uptodo.presentation.viewmodels.CalendarViewModel
+import com.kt.uptodo.utils.Gap
 import com.kt.uptodo.utils.padding
 import com.kt.uptodo.utils.rememberFirstVisibleWeekAfterScroll
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.LocalDate
 
 @Composable
@@ -79,12 +83,18 @@ fun CalendarScreen(
             .padding(LocalWindowInsets.current.asPaddingValues())
     ) { contentPadding ->
 
-        val todayTasks by viewModel.todayTasks.collectAsStateWithLifecycle()
+/*        val todayTasks by viewModel.todayTasks.collectAsStateWithLifecycle()
+        val unCompleteTasks by remember {
+            derivedStateOf { todayTasks.filter { !it.task.isComplete } }
+        }
         val completeTasks by remember {
             derivedStateOf {
                 todayTasks.filter { it.task.isComplete }
             }
-        }
+        }*/
+
+        val unCompleteTasks by viewModel.unCompleteTasks.collectAsStateWithLifecycle()
+        val completeTasks by viewModel.completeTasks.collectAsStateWithLifecycle()
 
         Box(
             modifier = Modifier.padding(contentPadding)
@@ -95,20 +105,23 @@ fun CalendarScreen(
                     key = "calendar_pager"
                 ) {
                     CalendarPager(
-                        onClick = { tab = it }
+                        onClick = { tab = it },
+                        modifier = Modifier.padding(horizontal = MaterialTheme.padding.mediumSmall)
                     )
                 }
 
                 items(
-                    items = if (tab == 0) todayTasks else completeTasks,
+                    items = if (tab == 0) unCompleteTasks else completeTasks,
                     key = { it.hashCode() }
                 ) {
                     TaskItem(
                         taskDetail = it,
                         onClick = {
                             navController.navigate("task_detail/${it.task.taskId}")
-                        }
+                        },
+                        modifier = Modifier.padding(horizontal = MaterialTheme.padding.mediumSmall)
                     )
+                    Gap(MaterialTheme.padding.small)
                 }
             }
         }
@@ -179,40 +192,48 @@ private fun CalendarTopBar(
 
 @Composable
 private fun CalendarPager(
+    modifier: Modifier = Modifier,
     onClick: (Int) -> Unit
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
-
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
     ) {
         TextButton(
+            border = BorderStroke(1.dp, if (selectedTab == 1) MaterialTheme.colorScheme.outlineVariant else Color.Transparent),
+            shape = MaterialTheme.shapes.extraSmall,
             onClick = {
                 onClick(0)
                 selectedTab = 0
             },
-            modifier = Modifier.weight(1f),
             colors = ButtonDefaults.textButtonColors(
-                containerColor = Color.Transparent,
-                contentColor = if (selectedTab == 1) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-            )
+                containerColor = if (selectedTab == 0) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                contentColor = if (selectedTab == 0) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+            ),
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = MaterialTheme.padding.mediumSmall),
         ) {
             Text("Today")
         }
 
         TextButton(
+            border = BorderStroke(1.dp, if (selectedTab == 0) MaterialTheme.colorScheme.outlineVariant else Color.Transparent),
+            shape = MaterialTheme.shapes.extraSmall,
             onClick = {
                 onClick(1)
                 selectedTab = 1
             },
-            modifier = Modifier.weight(1f),
             colors = ButtonDefaults.textButtonColors(
-                containerColor = Color.Transparent,
-                contentColor = if (selectedTab == 2) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-            )
+                containerColor = if (selectedTab == 1) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                contentColor = if (selectedTab == 1) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+            ),
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = MaterialTheme.padding.mediumSmall)
         ) {
             Text("Completed")
         }

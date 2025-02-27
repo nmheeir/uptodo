@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import java.time.LocalDate
@@ -24,8 +25,16 @@ class CalendarViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val todayTasks: StateFlow<List<TaskDetail>> = selectedDay.flatMapLatest { day ->
-        database.getTasks(createdAt = day.atStartOfDay())
+        database.getTasks(deadline = day.atStartOfDay())
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    val unCompleteTasks: StateFlow<List<TaskDetail>> = todayTasks
+        .map { tasks -> tasks.filter { !it.task.isComplete } }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    val completeTasks: StateFlow<List<TaskDetail>> = todayTasks
+        .map { tasks -> tasks.filter { it.task.isComplete } }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun onAction(action: CalendarUiAction) {
         when (action) {

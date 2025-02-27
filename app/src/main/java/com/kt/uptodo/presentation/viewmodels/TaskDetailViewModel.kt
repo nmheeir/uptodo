@@ -3,21 +3,14 @@ package com.kt.uptodo.presentation.viewmodels
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kt.uptodo.data.UptodoDatabase
 import com.kt.uptodo.data.entities.CategoryEntity
 import com.kt.uptodo.data.enums.Priority
 import com.kt.uptodo.data.relations.TaskDetail
-import com.kt.uptodo.presentation.shared.NewTaskSheetUiAction
-import com.kt.uptodo.utils.fakeTaskDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -34,9 +27,6 @@ class TaskDetailViewModel @Inject constructor(
 
     val subTask = database.subTasks(taskId)
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
-    private val _channel = Channel<ShowDialogEvent>()
-    val channel = _channel.receiveAsFlow()
 
     fun onAction(action: TaskDetailAction) {
         viewModelScope.launch {

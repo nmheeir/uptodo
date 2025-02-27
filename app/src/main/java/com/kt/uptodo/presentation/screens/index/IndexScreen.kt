@@ -95,7 +95,7 @@ fun IndexScreen(
                 verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
                 modifier = Modifier
                     .align(Alignment.TopStart)
-//                .padding(horizontal = MaterialTheme.padding.mediumSmall)
+                .padding(horizontal = MaterialTheme.padding.mediumSmall)
             ) {
                 allTasks.takeIf { it.isNotEmpty() }?.let { tasks ->
                     item {

@@ -55,14 +55,17 @@ fun TaskItem(
     val scope = rememberCoroutineScope()
 
     var showDeleteTaskDialog by remember { mutableStateOf(false) }
+    var showCompleteTaskDialog by remember { mutableStateOf(false) }
+
     val dismissState = rememberSwipeToDismissBoxState(
         positionalThreshold = { totalDistance ->
-            totalDistance * 0.9f
+            totalDistance / 100
         },
         confirmValueChange = { dismissValue ->
             if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                Timber.d(dismissValue.toString())
                 showDeleteTaskDialog = true
+            } else if (dismissValue == SwipeToDismissBoxValue.StartToEnd) {
+                showCompleteTaskDialog = true
             }
             true
         }
@@ -77,7 +80,7 @@ fun TaskItem(
                 endIcon = R.drawable.ic_delete
             )
         },
-        enableDismissFromStartToEnd = false
+        enableDismissFromStartToEnd = !taskDetail.task.isComplete
     ) {
         Box(
             modifier = if (onClick != null) {
@@ -93,7 +96,6 @@ fun TaskItem(
                     .fillMaxWidth()
                     .padding(MaterialTheme.padding.small)
             ) {
-
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -159,6 +161,38 @@ fun TaskItem(
                 }
             ) {
                 Text(text = "Do you want to delete this task ?")
+            }
+        }
+
+        if (showCompleteTaskDialog) {
+            DefaultDialog(
+                onDismiss = { showCompleteTaskDialog = false },
+                buttons = {
+                    TextButton(
+                        onClick = {
+                            scope.launch {
+                                dismissState.reset()
+                            }
+                            showCompleteTaskDialog = false
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.action_cancel))
+                    }
+                    TextButton(
+                        onClick = {
+                            scope.launch(Dispatchers.IO) {
+                                val updateTask = taskDetail.task.copy(
+                                    isComplete = true
+                                )
+                                database.update(updateTask)
+                            }
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.ok))
+                    }
+                }
+            ) {
+                Text(text = "Do you want to complete this task ?")
             }
         }
     }
