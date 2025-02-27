@@ -30,9 +30,12 @@ import com.kt.uptodo.R
 import com.kt.uptodo.presentation.LocalWindowInsets
 import com.kt.uptodo.presentation.components.NewTaskBottomSheet
 import com.kt.uptodo.presentation.components.TaskItem
+import com.kt.uptodo.presentation.screens.EmptyScreen
+import com.kt.uptodo.presentation.screens.EmptyScreenAction
 import com.kt.uptodo.presentation.shared.NewTaskViewModel
 import com.kt.uptodo.presentation.viewmodels.IndexViewModel
 import com.kt.uptodo.utils.padding
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun IndexScreen(
@@ -44,11 +47,26 @@ fun IndexScreen(
     val allTasks by viewModel.allTasks.collectAsStateWithLifecycle()
     val newTask by newTaskViewModel.newTask.collectAsStateWithLifecycle()
 
+    var showBottomSheet by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(LocalWindowInsets.current.asPaddingValues())
     ) {
+        if (allTasks.isEmpty()) {
+            EmptyScreen(
+                modifier = Modifier.fillMaxSize(),
+                stringRes = R.string.empty_description,
+                actions = persistentListOf(
+                    EmptyScreenAction(
+                        stringRes = R.string.action_add_task,
+                        icon = R.drawable.ic_add_box,
+                        onClick = { showBottomSheet = true }
+                    )
+                )
+            )
+        }
+
         LazyColumn(
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
@@ -56,13 +74,6 @@ fun IndexScreen(
                 .align(Alignment.TopStart)
 //                .padding(horizontal = MaterialTheme.padding.mediumSmall)
         ) {
-            item {
-                if (allTasks.isEmpty()) {
-                    Text(
-                        text = "is empty"
-                    )
-                }
-            }
             allTasks.takeIf { it.isNotEmpty() }?.let { tasks ->
                 item {
                     Text(
@@ -110,7 +121,6 @@ fun IndexScreen(
             }
         }
 
-        var showBottomSheet by remember { mutableStateOf(false) }
         FloatingActionButton(
             onClick = {
                 showBottomSheet = true

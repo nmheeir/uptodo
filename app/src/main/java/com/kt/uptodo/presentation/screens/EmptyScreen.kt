@@ -66,7 +66,7 @@ fun EmptyScreen(
     ) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Icon(
-                painter = painterResource(R.drawable.img_empty_todo),
+                painter = painterResource(R.drawable.ic_calendar_month),
                 contentDescription = null
             )
         }

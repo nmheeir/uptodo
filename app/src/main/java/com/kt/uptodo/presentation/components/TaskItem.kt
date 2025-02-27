@@ -69,7 +69,7 @@ fun TaskItem(
     )
 
     SwipeToDismissBox(
-        modifier = Modifier,
+        modifier = modifier,
         state = dismissState,
         backgroundContent = {
             SwipeBackground(
@@ -88,7 +88,7 @@ fun TaskItem(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier
+                modifier = Modifier
                     .background(MaterialTheme.colorScheme.surfaceContainer)
                     .fillMaxWidth()
                     .padding(MaterialTheme.padding.small)

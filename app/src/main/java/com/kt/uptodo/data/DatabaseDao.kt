@@ -54,7 +54,7 @@ interface DatabaseDao {
     /*Transaction*/
     @Transaction
     @Query("SELECT * FROM tasks WHERE $C_TASK_ID = :taskId")
-    suspend fun task(taskId: Long): TaskDetail?
+    fun task(taskId: Long): Flow<TaskDetail?>
 
     @Transaction
     @Query("SELECT * FROM tasks")

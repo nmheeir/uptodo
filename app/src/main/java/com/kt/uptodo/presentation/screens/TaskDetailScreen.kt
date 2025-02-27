@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -24,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,10 +65,10 @@ import com.kt.uptodo.presentation.theme.UpTodoTheme
 import com.kt.uptodo.presentation.viewmodels.ShowDialogEvent
 import com.kt.uptodo.presentation.viewmodels.TaskDetailAction
 import com.kt.uptodo.presentation.viewmodels.TaskDetailViewModel
-import com.kt.uptodo.utils.DefaultTask
 import com.kt.uptodo.utils.Gap
 import com.kt.uptodo.utils.fakeTaskDetails
 import com.kt.uptodo.utils.padding
+import kotlinx.coroutines.delay
 
 @Composable
 fun TaskDetailScreen(
@@ -85,9 +88,12 @@ fun TaskDetailScreen(
             .padding(horizontal = MaterialTheme.padding.mediumSmall)
     ) {
         if (task == null) {
-            Text(
-                text = "null"
-            )
+            EmptyScreen(stringRes = R.string.no_task)
+
+            LaunchedEffect(Unit) {
+                delay(300)
+                navController.navigateUp()
+            }
         } else {
             TaskDetailScreenContent(
                 navController = navController,
@@ -192,7 +198,10 @@ private fun TaskDetailScreenContent(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ),
-            onClick = {},
+            onClick = {
+                action(TaskDetailAction.CompleteTask)
+                navController.navigateUp()
+            },
             modifier = Modifier
                 .fillMaxWidth()
         ) {
@@ -292,47 +301,59 @@ private fun TaskDetailContent(
     subTask: List<TaskDetail>,
     showDialog: (ShowDialogEvent) -> Unit
 ) {
-    Column(
+    LazyColumn(
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
         modifier = modifier
-            .verticalScroll(rememberScrollState())
     ) {
-        TaskDetailHeader(task = taskDetail.task)
+        item {
+            TaskDetailHeader(task = taskDetail.task)
+        }
 
-        TaskDetailRow(
-            icon = R.drawable.ic_timer,
-            title = stringResource(id = R.string.label_task_time),
-            content = taskDetail.task.deadline.convertToDeadline(),
-            onClick = { showDialog(ShowDialogEvent.ShowTaskTimeDialog) }
-        )
+        item {
+            TaskDetailRow(
+                icon = R.drawable.ic_timer,
+                title = stringResource(id = R.string.label_task_time),
+                content = taskDetail.task.deadline.convertToDeadline(),
+                onClick = { showDialog(ShowDialogEvent.ShowTaskTimeDialog) }
+            )
+        }
 
-        TaskDetailRow(
-            icon = R.drawable.ic_sell,
-            title = stringResource(R.string.label_task_category),
-            content = taskDetail.category.name,
-            containerColor = Color(android.graphics.Color.parseColor(taskDetail.category.color)).copy(
-                alpha = 0.32f
-            ),
-            contentColor = Color(android.graphics.Color.parseColor(taskDetail.category.color)),
-            onClick = { showDialog(ShowDialogEvent.ShowTaskCategoryDialog) }
-        )
+        item {
+            TaskDetailRow(
+                icon = R.drawable.ic_sell,
+                title = stringResource(R.string.label_task_category),
+                content = taskDetail.category.name,
+                containerColor = Color(android.graphics.Color.parseColor(taskDetail.category.color)).copy(
+                    alpha = 0.32f
+                ),
+                contentColor = Color(android.graphics.Color.parseColor(taskDetail.category.color)),
+                onClick = { showDialog(ShowDialogEvent.ShowTaskCategoryDialog) }
+            )
+        }
 
-        TaskDetailRow(
-            icon = R.drawable.ic_flag_2,
-            title = stringResource(R.string.label_task_priority),
-            content = taskDetail.task.priority.name,
-            onClick = { showDialog(ShowDialogEvent.ShowTaskPriorityDialog) }
-        )
+        item {
+            TaskDetailRow(
+                icon = R.drawable.ic_flag_2,
+                title = stringResource(R.string.label_task_priority),
+                content = taskDetail.task.priority.name,
+                onClick = { showDialog(ShowDialogEvent.ShowTaskPriorityDialog) }
+            )
+        }
 
-        TaskDetailRow(
-            icon = R.drawable.ic_graph_1,
-            title = stringResource(R.string.label_sub_task),
-            content = stringResource(R.string.action_add_subtask),
-            onClick = { showDialog(ShowDialogEvent.ShowAddSubTaskDialog) }
-        )
+        item {
+            TaskDetailRow(
+                icon = R.drawable.ic_graph_1,
+                title = stringResource(R.string.label_sub_task),
+                content = stringResource(R.string.action_add_subtask),
+                onClick = { showDialog(ShowDialogEvent.ShowAddSubTaskDialog) }
+            )
+        }
 
         if (subTask.isNotEmpty()) {
-            subTask.fastForEach {
+            items(
+                items = subTask,
+                key = { it.hashCode() }
+            ) {
                 TaskItem(
                     taskDetail = it,
                     modifier = Modifier.padding(start = MaterialTheme.padding.medium)
@@ -340,24 +361,26 @@ private fun TaskDetailContent(
             }
         }
 
-        TextButton(
-            onClick = {}
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.medium),
-                modifier = Modifier.fillMaxWidth()
+        item {
+            TextButton(
+                onClick = { showDialog(ShowDialogEvent.ShowDeleteTaskDialog) }
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_delete),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
-                )
-                Text(
-                    text = stringResource(R.string.action_delete_task),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.medium),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_delete),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                    Text(
+                        text = stringResource(R.string.action_delete_task),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             }
         }
     }

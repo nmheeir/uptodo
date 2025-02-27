@@ -29,7 +29,9 @@ class TaskDetailViewModel @Inject constructor(
 
     private val taskId: Long = savedStateHandle.get<Long>("taskId")!!
 
-    val taskDetail = MutableStateFlow<TaskDetail?>(null)
+    val taskDetail = database.task(taskId)
+        .stateIn(viewModelScope, SharingStarted.Lazily, null)
+
     val subTask = database.subTasks(taskId)
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
@@ -37,43 +39,41 @@ class TaskDetailViewModel @Inject constructor(
     val channel = _channel.receiveAsFlow()
 
     fun onAction(action: TaskDetailAction) {
-        when (action) {
-            is TaskDetailAction.UpdateTaskCategory -> {
-                taskDetail.value = taskDetail.value!!.copy(category = action.category)
-            }
+        viewModelScope.launch {
+            when (action) {
+                is TaskDetailAction.UpdateTaskCategory -> {
+                    database.update(taskDetail.value!!.task.copy(categoryId = action.category.categoryId))
+                }
 
-            is TaskDetailAction.UpdateTaskPriority -> {
-                taskDetail.value =
-                    taskDetail.value!!.copy(task = taskDetail.value!!.task.copy(priority = action.priority))
-            }
+                is TaskDetailAction.UpdateTaskPriority -> {
+                    database.update(taskDetail.value!!.task.copy(priority = action.priority))
+                }
 
-            is TaskDetailAction.UpdateTaskTime -> {
-                taskDetail.value =
-                    taskDetail.value!!.copy(task = taskDetail.value!!.task.copy(deadline = action.time))
-            }
+                is TaskDetailAction.UpdateTaskTime -> {
+                    database.update(taskDetail.value!!.task.copy(deadline = action.time))
+                }
 
-            is TaskDetailAction.UpdateTaskTitle -> {
-                taskDetail.value =
-                    taskDetail.value!!.copy(task = taskDetail.value!!.task.copy(title = action.title))
-            }
+                is TaskDetailAction.UpdateTaskTitle -> {
+                    database.update(taskDetail.value!!.task.copy(title = action.title))
+                }
 
-            is TaskDetailAction.DeleteTask -> {
-                deleteTask()
+                is TaskDetailAction.DeleteTask -> {
+                    deleteTask()
+                }
+
+                TaskDetailAction.CompleteTask -> {
+                    completeTask()
+                }
             }
         }
     }
 
-    init {
-        Timber.d(taskId.toString())
-        viewModelScope.launch {
-            taskDetail.value = database.task(taskId)
-        }
+    private suspend fun completeTask() {
+        database.update(taskDetail.value!!.task.copy(isComplete = true))
     }
 
-    private fun deleteTask() {
-        viewModelScope.launch {
-//            database.delete()
-        }
+    private suspend fun deleteTask() {
+        database.delete(taskDetail.value!!.task)
     }
 }
 
@@ -83,6 +83,7 @@ sealed interface TaskDetailAction {
     data class UpdateTaskCategory(val category: CategoryEntity) : TaskDetailAction
     data class UpdateTaskPriority(val priority: Priority) : TaskDetailAction
     data class DeleteTask(val task: TaskDetail) : TaskDetailAction
+    data object CompleteTask : TaskDetailAction
 }
 
 sealed interface ShowDialogEvent {

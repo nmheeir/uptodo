@@ -8,6 +8,7 @@
 
     <string name="empty_description">What do you want to do today?</string>
     <string name="ok">OK</string>
+    <string name="no_task">Can\'t found any task</string>
 
     <!--Label-->
     <string name="label_today">Today</string>
