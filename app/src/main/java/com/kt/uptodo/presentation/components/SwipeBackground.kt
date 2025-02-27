@@ -17,6 +17,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import com.kt.uptodo.utils.padding
 
@@ -58,6 +59,7 @@ fun SwipeBackground(
 
     Box(
         modifier = modifier
+            .clip(MaterialTheme.shapes.small)
             .fillMaxSize()
             .background(color)
     ) {
