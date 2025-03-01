@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.kt.uptodo.data.entities.CategoryEntity
+import com.kt.uptodo.data.entities.FocusSessionEntity
 import com.kt.uptodo.data.entities.TaskEntity
 
 
@@ -35,7 +36,8 @@ class UptodoDatabase(
 @Database(
     entities = [
         TaskEntity::class,
-        CategoryEntity::class
+        CategoryEntity::class,
+        FocusSessionEntity::class
     ],
     version = 1,
     exportSchema = true

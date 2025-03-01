@@ -3,6 +3,7 @@ package com.kt.uptodo.extensions
 import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.Month
 import java.time.OffsetDateTime
 import java.time.YearMonth
@@ -12,9 +13,14 @@ import java.util.Locale
 
 private val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 private val formatterMinute = DateTimeFormatter.ofPattern("HH:mm")
+private val formatterSecond = DateTimeFormatter.ofPattern("HH:mm:ss")
 
 fun LocalDateTime.parseMinute(): String {
     return this.format(formatterMinute)
+}
+
+fun LocalTime.parse(): String {
+    return this.format(formatterSecond)
 }
 
 fun LocalDateTime.convertToDeadline(): String {
@@ -43,7 +49,7 @@ fun LocalDateTime.convertToDeadline(): String {
     return deadlineText
 }
 
-fun YearMonth.displayText(short: Boolean = false) : String {
+fun YearMonth.displayText(short: Boolean = false): String {
     return "${this.month.displayText(short = short)} ${this.year}"
 }
 
@@ -57,4 +63,12 @@ fun DayOfWeek.displayText(uppercase: Boolean = false, narrow: Boolean = false): 
     return getDisplayName(style, Locale.ENGLISH).let { value ->
         if (uppercase) value.uppercase(Locale.ENGLISH) else value
     }
+}
+
+fun LocalTime.toSeconds(): Long {
+    return (this.hour * 3600 + this.minute * 60 + this.second).toLong()
+}
+
+fun LocalTime.toMilliSeconds(): Long {
+    return this.toSeconds() * 1000L
 }
