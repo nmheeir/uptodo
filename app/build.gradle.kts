@@ -91,6 +91,5 @@ dependencies {
     //Calendar
     implementation("com.kizitonwose.calendar:compose:2.6.2")
 
-    //Wheel Picker
-    implementation("com.github.commandiron:WheelPickerCompose:1.1.11")
+    implementation("dev.chrisbanes.snapper:snapper:0.3.0")
 }

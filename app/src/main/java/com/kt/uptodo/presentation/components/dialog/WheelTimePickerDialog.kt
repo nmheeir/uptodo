@@ -7,12 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.commandiron.wheel_picker_compose.WheelTimePicker
-import com.commandiron.wheel_picker_compose.core.SelectorProperties
-import com.commandiron.wheel_picker_compose.core.TimeFormat
-import com.commandiron.wheel_picker_compose.core.WheelPickerDefaults
-import java.time.LocalDateTime
+import com.kt.uptodo.core.presentation.TimeFormat
+import com.kt.uptodo.presentation.components.wheel.WheelTimePicker
 import java.time.LocalTime
 
 @Composable

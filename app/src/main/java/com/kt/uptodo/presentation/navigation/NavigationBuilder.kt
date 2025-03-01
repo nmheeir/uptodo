@@ -27,7 +27,7 @@ fun NavGraphBuilder.navigationBuilder(
     composable(
         route = Screens.Focus.route
     ) {
-        FocusScreen()
+        FocusScreen(navController)
     }
 
     composable(
