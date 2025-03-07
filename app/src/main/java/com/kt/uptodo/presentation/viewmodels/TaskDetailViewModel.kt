@@ -28,36 +28,6 @@ class TaskDetailViewModel @Inject constructor(
     val subTask = database.subTasks(taskId)
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun onAction(action: TaskDetailAction) {
-        viewModelScope.launch {
-            when (action) {
-                is TaskDetailAction.UpdateTaskCategory -> {
-                    database.update(taskDetail.value!!.task.copy(categoryId = action.category.categoryId))
-                }
-
-                is TaskDetailAction.UpdateTaskPriority -> {
-                    database.update(taskDetail.value!!.task.copy(priority = action.priority))
-                }
-
-                is TaskDetailAction.UpdateTaskTime -> {
-                    database.update(taskDetail.value!!.task.copy(deadline = action.time))
-                }
-
-                is TaskDetailAction.UpdateTaskTitle -> {
-                    database.update(taskDetail.value!!.task.copy(title = action.title))
-                }
-
-                is TaskDetailAction.DeleteTask -> {
-                    deleteTask()
-                }
-
-                TaskDetailAction.CompleteTask -> {
-                    completeTask()
-                }
-            }
-        }
-    }
-
     private suspend fun completeTask() {
         database.update(taskDetail.value!!.task.copy(isComplete = true))
     }
@@ -82,4 +52,5 @@ sealed interface ShowDialogEvent {
     data object ShowTaskPriorityDialog : ShowDialogEvent
     data object ShowAddSubTaskDialog : ShowDialogEvent
     data object ShowDeleteTaskDialog : ShowDialogEvent
+    data object ShowDurationDialog : ShowDialogEvent
 }

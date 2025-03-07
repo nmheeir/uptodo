@@ -17,6 +17,7 @@ import com.kt.uptodo.data.entities.C_PRIORITY
 import com.kt.uptodo.data.entities.C_TASK_ID
 import com.kt.uptodo.data.entities.C_UPDATED_AT
 import com.kt.uptodo.data.entities.CategoryEntity
+import com.kt.uptodo.data.entities.FocusSessionEntity
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.enums.Priority
 import com.kt.uptodo.data.relations.TaskDetail
@@ -33,16 +34,19 @@ interface DatabaseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(category: CategoryEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(focusSession: FocusSessionEntity)
+
     /*Update*/
     @Update
-    suspend fun update(task: TaskEntity)
+    fun update(task: TaskEntity)
 
     @Update
     suspend fun update(category: CategoryEntity)
 
     /*Delete*/
     @Delete
-    suspend fun delete(task: TaskEntity)
+    fun delete(task: TaskEntity)
 
     @Delete
     suspend fun delete(category: CategoryEntity)
@@ -50,6 +54,9 @@ interface DatabaseDao {
     /*Query*/
     @Query("SELECT * FROM categories")
     fun categories(): Flow<List<CategoryEntity>>
+
+    @Query("SELECT * FROM focus_session")
+    fun focusSessions(): Flow<List<FocusSessionEntity>>
 
     /*Transaction*/
     @Transaction

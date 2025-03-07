@@ -1,38 +1,45 @@
 package com.kt.uptodo.presentation.screens
 
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.kt.uptodo.R
 import com.kt.uptodo.extensions.parse
 import com.kt.uptodo.presentation.LocalWindowInsets
+import com.kt.uptodo.presentation.components.wheel.WheelTimePicker
 import com.kt.uptodo.presentation.viewmodels.FocusState
 import com.kt.uptodo.presentation.viewmodels.FocusUiAction
 import com.kt.uptodo.presentation.viewmodels.FocusViewModel
+import com.kt.uptodo.utils.Gap
+import com.kt.uptodo.utils.padding
+import timber.log.Timber
+import java.time.LocalTime
 
 @Composable
 fun FocusScreen(
@@ -50,35 +57,25 @@ fun FocusScreen(
         },
         modifier = Modifier.padding(LocalWindowInsets.current.asPaddingValues())
     ) { contentPadding ->
+        val focusHistory by viewModel.focusHistory.collectAsStateWithLifecycle()
         LazyColumn(
             modifier = Modifier
                 .padding(contentPadding)
                 .fillMaxSize()
         ) {
             item {
-                val focusTime by viewModel.focusTime.collectAsStateWithLifecycle()
-                val focusProgress by viewModel.focusProgress.collectAsStateWithLifecycle()
-                val focusState by viewModel.focusState.collectAsStateWithLifecycle()
+                FocusSection(viewModel = viewModel)
+            }
 
-                val animProgress by animateFloatAsState(
-                    targetValue = focusProgress,
-                    label = "focusProgress",
-                    animationSpec = tween(
-                        durationMillis = 100,
-                        easing = LinearOutSlowInEasing
-                    )
+            //Focus history
+            items(
+                items = focusHistory,
+                key = { it.focusSessionId }
+            ) { focusSession ->
+                Text(
+                    text = focusSession.duration.toString()
                 )
-
-                val parseFocusTime by remember {
-                    derivedStateOf { focusTime.parse() }
-                }
-
-                FocusSection(
-                    focusTime = { parseFocusTime },
-                    focusProgress = { animProgress },
-                    focusState = focusState,
-                    action = viewModel::onAction
-                )
+                Gap(MaterialTheme.padding.medium)
             }
         }
     }
@@ -87,10 +84,7 @@ fun FocusScreen(
 @Composable
 private fun FocusSection(
     modifier: Modifier = Modifier,
-    focusTime: () -> String,
-    focusProgress: () -> Float,
-    focusState: FocusState,
-    action: (FocusUiAction) -> Unit
+    viewModel: FocusViewModel
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -98,33 +92,96 @@ private fun FocusSection(
         modifier = modifier
             .fillMaxSize()
     ) {
-        if (focusState == FocusState.RUNNING) {
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    progress = focusProgress,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    strokeWidth = 10.dp,
-                    modifier = Modifier
-                        .size(256.dp),
+        val focusState by viewModel.focusState.collectAsStateWithLifecycle()
+        AnimatedContent(
+            targetState = focusState,
+            contentKey = {
+                when (it) {
+                    FocusState.STOPPED -> "change"
+                    else -> "nothing"
+                }
+            }
+        ) { state ->
+            if (state == FocusState.STOPPED) {
+                SelectFocusTime(
+                    action = viewModel::onAction,
                 )
-                Text(
-                    text = focusTime(),
-                    modifier = Modifier.align(Alignment.Center)
-                )
+            } else {
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    val focusProgress by viewModel.focusProgress.collectAsStateWithLifecycle()
+                    CircularProgressIndicator(
+                        progress = { focusProgress },
+                        color = MaterialTheme.colorScheme.tertiary,
+                        strokeWidth = 10.dp,
+                        modifier = Modifier
+                            .size(256.dp),
+                    )
+                    val focusTime by viewModel.remainingTime.collectAsStateWithLifecycle()
+                    Text(
+                        text = focusTime.parse(),
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
         }
 
-        Button(
+        FocusSectionButton(focusState = focusState, action = viewModel::onAction)
+    }
+}
+
+@Composable
+private fun FocusSectionButton(
+    modifier: Modifier = Modifier,
+    focusState: FocusState,
+    action: (FocusUiAction) -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        IconButton(
             onClick = {
-                action(FocusUiAction.StartFocusSession)
-            },
-            enabled = focusState == FocusState.END
+                if (focusState == FocusState.STOPPED) {
+                    action(FocusUiAction.StartFocus)
+                } else {
+                    action(FocusUiAction.ToggleFocus)
+                }
+            }
         ) {
-            Text(
-                text = "Focus"
+            Icon(
+                painter = painterResource(
+                    if (focusState == FocusState.RUNNING) R.drawable.ic_pause
+                    else R.drawable.ic_play_arrow
+                ),
+                contentDescription = null
             )
         }
+
+        if (focusState != FocusState.STOPPED) {
+            IconButton(
+                onClick = {
+                    action(FocusUiAction.EndFocus)
+                    Timber.d("End focus")
+                }
+            ) {
+                Icon(painterResource(R.drawable.ic_refresh), null)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SelectFocusTime(
+    modifier: Modifier = Modifier,
+    action: (FocusUiAction) -> Unit
+) {
+    WheelTimePicker(
+        startTime = LocalTime.of(0, 0, 0),
+        size = DpSize(128.dp, 128.dp),
+        modifier = modifier
+    ) { time ->
+        action(FocusUiAction.SetFocusTime(time))
     }
 }

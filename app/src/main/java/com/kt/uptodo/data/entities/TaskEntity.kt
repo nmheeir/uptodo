@@ -19,6 +19,7 @@ data class TaskEntity(
     @ColumnInfo(name = C_UPDATED_AT) val updatedAt: LocalDateTime? = null,
     @ColumnInfo(name = C_IS_COMPLETE) val isComplete: Boolean = false,
     @ColumnInfo(name = C_IS_REMINDER) val isReminder: Boolean,
+    @ColumnInfo(name = C_DURATION) val duration: Long = 0,
     @ColumnInfo(name = C_DEADLINE) val deadline: LocalDateTime
 )
 
@@ -33,3 +34,4 @@ const val C_UPDATED_AT = "updated_at"
 const val C_IS_COMPLETE = "is_complete"
 const val C_IS_REMINDER = "is_reminder"
 const val C_DEADLINE = "deadline"
+const val C_DURATION = "duration"

@@ -39,7 +39,7 @@ val DefaultTask = TaskEntity(
     description = "",
     priority = Priority.LOW,
     deadline = LocalDateTime.now(),
-    isReminder = false
+    isReminder = false,
 )
 
 val DefaultTaskDetail = TaskDetail(

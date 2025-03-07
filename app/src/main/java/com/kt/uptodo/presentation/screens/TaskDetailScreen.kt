@@ -16,13 +16,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,19 +42,22 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEach
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.kt.uptodo.R
 import com.kt.uptodo.data.entities.TaskEntity
 import com.kt.uptodo.data.relations.TaskDetail
-import com.kt.uptodo.extensions.convertToDeadline
+import com.kt.uptodo.extensions.parseColor
+import com.kt.uptodo.extensions.parseDate
+import com.kt.uptodo.extensions.parseToTime
+import com.kt.uptodo.presentation.LocalDatabase
 import com.kt.uptodo.presentation.LocalWindowInsets
 import com.kt.uptodo.presentation.components.NewTaskBottomSheet
 import com.kt.uptodo.presentation.components.TaskItem
 import com.kt.uptodo.presentation.components.dialog.CategoryDialog
 import com.kt.uptodo.presentation.components.dialog.DefaultDialog
+import com.kt.uptodo.presentation.components.dialog.DurationDialog
 import com.kt.uptodo.presentation.components.dialog.PriorityDialog
 import com.kt.uptodo.presentation.components.dialog.TaskTimeDialog
 import com.kt.uptodo.presentation.components.dialog.TextFieldDialog
@@ -76,310 +78,189 @@ fun TaskDetailScreen(
     viewModel: TaskDetailViewModel = hiltViewModel(),
     newTaskViewModel: NewTaskViewModel = hiltViewModel()
 ) {
-    val task by viewModel.taskDetail.collectAsStateWithLifecycle()
+    val database = LocalDatabase.current
+    val taskDetail by viewModel.taskDetail.collectAsStateWithLifecycle()
     val subTask by viewModel.subTask.collectAsStateWithLifecycle()
     val newTask by newTaskViewModel.newTask.collectAsStateWithLifecycle()
 
-    Box(
-        contentAlignment = Alignment.TopStart,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(LocalWindowInsets.current.asPaddingValues())
-            .padding(horizontal = MaterialTheme.padding.mediumSmall)
-    ) {
-        if (task == null) {
-            EmptyScreen(stringRes = R.string.no_task)
-
-            LaunchedEffect(Unit) {
-                delay(300)
-                navController.navigateUp()
-            }
-        } else {
-            TaskDetailScreenContent(
-                navController = navController,
-                taskDetail = task!!,
-                newTask = newTask,
-                subTask = subTask,
-                action = viewModel::onAction,
-                newTaskAction = newTaskViewModel::onAction
-            )
-        }
-    }
-}
-
-@Composable
-private fun TaskDetailScreenContent(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    taskDetail: TaskDetail,
-    newTask: TaskEntity,
-    subTask: List<TaskDetail>,
-    action: (TaskDetailAction) -> Unit,
-    newTaskAction: (NewTaskSheetUiAction) -> Unit
-) {
-    var showEditTaskTitleDialog by remember { mutableStateOf(false) }
-    var showTaskTimeDialog by remember { mutableStateOf(false) }
-    var showTaskCategoryDialog by remember { mutableStateOf(false) }
-    var showTaskPriorityDialog by remember { mutableStateOf(false) }
-    var showAddSubTaskDialog by remember { mutableStateOf(false) }
-    var showDeleteTaskDialog by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxSize()
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            IconButton(
-                onClick = navController::navigateUp
+    Scaffold(
+        topBar = {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_close),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-
-            IconButton(
-                onClick = { showEditTaskTitleDialog = true }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_border_color),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-        }
-
-        Gap(height = MaterialTheme.padding.medium)
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            TaskDetailContent(
-                taskDetail = taskDetail,
-                subTask = subTask,
-                showDialog = {
-                    when (it) {
-                        ShowDialogEvent.ShowAddSubTaskDialog -> {
-                            showAddSubTaskDialog = true
-                        }
-
-                        ShowDialogEvent.ShowTaskCategoryDialog -> {
-                            showTaskCategoryDialog = true
-                        }
-
-                        ShowDialogEvent.ShowTaskPriorityDialog -> {
-                            showTaskPriorityDialog = true
-                        }
-
-                        ShowDialogEvent.ShowTaskTimeDialog -> {
-                            showTaskTimeDialog = true
-                        }
-
-                        ShowDialogEvent.ShowDeleteTaskDialog -> {
-                            showDeleteTaskDialog = true
-                        }
-                    }
-                }
-            )
-        }
-
-        Button(
-            shape = MaterialTheme.shapes.extraSmall,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            onClick = {
-                action(TaskDetailAction.CompleteTask)
-                navController.navigateUp()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = stringResource(R.string.action_complete_task),
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-    }
-
-    if (showEditTaskTitleDialog) {
-        TextFieldDialog(
-            title = {
-                Text(
-                    text = stringResource(R.string.label_edit_task_title)
-                )
-            },
-            initialTextFieldValue = TextFieldValue(
-                text = taskDetail.task.title,
-                selection = TextRange(taskDetail.task.title.length)
-            ),
-            onDone = {
-                action(TaskDetailAction.UpdateTaskTitle(it))
-                showEditTaskTitleDialog = false
-            },
-            onDismiss = { showEditTaskTitleDialog = false }
-        )
-    }
-
-    if (showTaskTimeDialog) {
-        TaskTimeDialog(
-            taskDateTime = taskDetail.task.deadline,
-            onDismiss = { showTaskTimeDialog = false },
-            onTaskDateTimeChange = {
-                action(TaskDetailAction.UpdateTaskTime(it))
-            }
-        )
-    }
-
-    if (showTaskPriorityDialog) {
-        PriorityDialog(
-            selectedPriority = taskDetail.task.priority,
-            onValueSelected = {
-                action(TaskDetailAction.UpdateTaskPriority(it))
-                showTaskPriorityDialog = false
-            },
-            onDismiss = {
-                showTaskPriorityDialog = false
-            }
-        )
-    }
-
-    if (showAddSubTaskDialog) {
-        NewTaskBottomSheet(
-            onDismiss = { showAddSubTaskDialog = false },
-            action = newTaskAction,
-            newTask = newTask
-        )
-    }
-
-    if (showTaskCategoryDialog) {
-        CategoryDialog(
-            selectedCategoryId = taskDetail.category.categoryId,
-            onValueSelected = {
-                action(TaskDetailAction.UpdateTaskCategory(it))
-            },
-            onDismiss = { showTaskCategoryDialog = false },
-        )
-    }
-
-    if (showDeleteTaskDialog) {
-        DefaultDialog(
-            onDismiss = { showDeleteTaskDialog = false },
-            icon = {
-                Icon(painterResource(R.drawable.ic_delete), null)
-            },
-            buttons = {
-                TextButton(onClick = { showDeleteTaskDialog = false }) {
-                    Text(text = stringResource(android.R.string.cancel))
-                }
-                TextButton(
-                    onClick = { action(TaskDetailAction.DeleteTask(taskDetail)) }
-                ) {
-                    Text(text = stringResource(R.string.action_delete_task))
-                }
-            }
-        ) {
-
-        }
-    }
-}
-
-@Composable
-private fun TaskDetailContent(
-    modifier: Modifier = Modifier,
-    taskDetail: TaskDetail,
-    subTask: List<TaskDetail>,
-    showDialog: (ShowDialogEvent) -> Unit
-) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
-        modifier = modifier
-    ) {
-        item {
-            TaskDetailHeader(task = taskDetail.task)
-        }
-
-        item {
-            TaskDetailRow(
-                icon = R.drawable.ic_timer,
-                title = stringResource(id = R.string.label_task_time),
-                content = taskDetail.task.deadline.convertToDeadline(),
-                onClick = { showDialog(ShowDialogEvent.ShowTaskTimeDialog) }
-            )
-        }
-
-        item {
-            TaskDetailRow(
-                icon = R.drawable.ic_sell,
-                title = stringResource(R.string.label_task_category),
-                content = taskDetail.category.name,
-                containerColor = Color(android.graphics.Color.parseColor(taskDetail.category.color)).copy(
-                    alpha = 0.32f
-                ),
-                contentColor = Color(android.graphics.Color.parseColor(taskDetail.category.color)),
-                onClick = { showDialog(ShowDialogEvent.ShowTaskCategoryDialog) }
-            )
-        }
-
-        item {
-            TaskDetailRow(
-                icon = R.drawable.ic_flag_2,
-                title = stringResource(R.string.label_task_priority),
-                content = taskDetail.task.priority.name,
-                onClick = { showDialog(ShowDialogEvent.ShowTaskPriorityDialog) }
-            )
-        }
-
-        item {
-            TaskDetailRow(
-                icon = R.drawable.ic_graph_1,
-                title = stringResource(R.string.label_sub_task),
-                content = stringResource(R.string.action_add_subtask),
-                onClick = { showDialog(ShowDialogEvent.ShowAddSubTaskDialog) }
-            )
-        }
-
-        if (subTask.isNotEmpty()) {
-            items(
-                items = subTask,
-                key = { it.hashCode() }
-            ) {
-                TaskItem(
-                    taskDetail = it,
-                    modifier = Modifier.padding(start = MaterialTheme.padding.medium)
-                )
-            }
-        }
-
-        item {
-            TextButton(
-                onClick = { showDialog(ShowDialogEvent.ShowDeleteTaskDialog) }
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.medium),
-                    modifier = Modifier.fillMaxWidth()
+                IconButton(
+                    onClick = navController::navigateUp
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_delete),
+                        painter = painterResource(R.drawable.ic_close),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                    Text(
-                        text = stringResource(R.string.action_delete_task),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyLarge
+                }
+            }
+        },
+        modifier = Modifier
+            .padding(LocalWindowInsets.current.asPaddingValues())
+    ) { contentPadding ->
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(contentPadding)
+                .padding(horizontal = MaterialTheme.padding.mediumSmall)
+        ) {
+            taskDetail.takeIf { it != null }?.let { task ->
+
+                item {
+                    TaskDetailHeader(task = task.task)
+                }
+
+                item {
+                    var showDurationDialog by remember { mutableStateOf(false) }
+                    TaskDetailRow(
+                        icon = R.drawable.ic_timer,
+                        title = stringResource(R.string.label_duration),
+                        content = task.task.duration.parseToTime(),
+                        onClick = { showDurationDialog = true }
                     )
+                    if (showDurationDialog) {
+                        DurationDialog(
+                            onDismiss = { showDurationDialog = false }
+                        )
+                    }
+                }
+
+                item {
+                    var showTimerDialog by remember { mutableStateOf(false) }
+                    TaskDetailRow(
+                        icon = R.drawable.ic_calendar_clock,
+                        title = stringResource(id = R.string.label_deadline),
+                        content = task.task.deadline.parseDate(),
+                        onClick = { showTimerDialog = true }
+                    )
+                    if (showTimerDialog) {
+                        TaskTimeDialog(
+                            taskDateTime = task.task.deadline,
+                            onDismiss = { showTimerDialog = false },
+                            onTaskDateTimeChange = {
+                                showTimerDialog = false
+                            }
+                        )
+                    }
+                }
+
+                item {
+                    var showCategoryDialog by remember { mutableStateOf(false) }
+                    TaskDetailRow(
+                        icon = R.drawable.ic_sell,
+                        title = stringResource(R.string.label_task_category),
+                        content = task.category.name,
+                        containerColor = Color.parseColor(task.category.color).copy(
+                            alpha = 0.32f
+                        ),
+                        contentColor = Color.parseColor(task.category.color),
+                        onClick = { showCategoryDialog = true }
+                    )
+                    if (showCategoryDialog) {
+                        CategoryDialog(
+                            selectedCategoryId = task.category.categoryId,
+                            onValueSelected = {
+
+                            },
+                            onDismiss = { showCategoryDialog = false }
+                        )
+                    }
+                }
+
+                item {
+                    var showPriorityDialog by remember { mutableStateOf(false) }
+                    TaskDetailRow(
+                        icon = R.drawable.ic_flag_2,
+                        title = stringResource(R.string.label_task_priority),
+                        content = task.task.priority.name,
+                        onClick = { showPriorityDialog = true }
+                    )
+                    if (showPriorityDialog) {
+                        PriorityDialog(
+                            selectedPriority = task.task.priority,
+                            onValueSelected = {
+                                showPriorityDialog = false
+                            },
+                            onDismiss = {
+                                showPriorityDialog = false
+                            }
+                        )
+                    }
+                }
+
+                item {
+                    var showCreateSubTaskDialog by remember { mutableStateOf(false) }
+                    TaskDetailRow(
+                        icon = R.drawable.ic_graph_1,
+                        title = stringResource(R.string.label_sub_task),
+                        content = stringResource(R.string.action_add_subtask),
+                        onClick = { showCreateSubTaskDialog = true }
+                    )
+                    if (showCreateSubTaskDialog) {
+                        NewTaskBottomSheet(
+                            onDismiss = { showCreateSubTaskDialog = false },
+                            action = {},
+                            newTask = newTask
+                        )
+                    }
+                }
+
+                item {
+                    Row {
+                        var showDeleteTaskDialog by remember { mutableStateOf(false) }
+                        TextButton(
+                            onClick = { showDeleteTaskDialog = true },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.action_delete_task)
+                            )
+                            if (showDeleteTaskDialog) {
+                                DefaultDialog(
+                                    onDismiss = { showDeleteTaskDialog = true },
+                                    buttons = {
+                                        TextButton(onClick = { showDeleteTaskDialog = false }) {
+                                            Text(text = stringResource(android.R.string.cancel))
+                                        }
+                                        TextButton(
+                                            onClick = {
+                                                database.query {
+                                                    delete(task.task)
+                                                }
+                                                navController.navigateUp()
+                                            }
+                                        ) {
+                                            Text(text = stringResource(R.string.action_delete_task))
+                                        }
+                                    }
+                                ) {
+                                    Text(
+                                        text = "Do you want to delete this task"
+                                    )
+                                }
+                            }
+                        }
+                        TextButton(
+                            onClick = {
+                                database.query {
+                                    update(task.task.copy(isComplete = true))
+                                }
+                                navController.navigateUp()
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.action_complete_task)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -415,19 +296,24 @@ private fun TaskDetailRow(
             )
         }
 
-        TextButton(
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = contentColor,
-                containerColor = containerColor
-            ),
-            shape = MaterialTheme.shapes.medium,
-            onClick = onClick
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = content,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
-            )
+            TextButton(
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = contentColor,
+                    containerColor = containerColor
+                ),
+                shape = MaterialTheme.shapes.medium,
+                onClick = onClick
+            ) {
+                Text(
+                    text = content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                )
+            }
         }
     }
 }
@@ -456,7 +342,7 @@ private fun TaskDetailHeader(
         Column(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.extraSmall),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = task.title
@@ -464,13 +350,35 @@ private fun TaskDetailHeader(
             TaskDetailDescription(task.description)
         }
 
+        var showEditTaskTitleDialog by remember { mutableStateOf(false) }
         IconButton(
-            onClick = {}
+            onClick = { showEditTaskTitleDialog = true }
         ) {
+            val database = LocalDatabase.current
             Icon(
                 painter = painterResource(R.drawable.ic_border_color),
                 contentDescription = null
             )
+            if (showEditTaskTitleDialog) {
+                TextFieldDialog(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.label_edit_task_title)
+                        )
+                    },
+                    initialTextFieldValue = TextFieldValue(
+                        text = task.title,
+                        selection = TextRange(task.title.length)
+                    ),
+                    onDone = {
+                        database.query {
+                            update(task.copy(title = it))
+                        }
+                        showEditTaskTitleDialog = false
+                    },
+                    onDismiss = { showEditTaskTitleDialog = false }
+                )
+            }
         }
     }
 }
@@ -519,18 +427,5 @@ private fun TaskDetailDescription(
                 )
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-private fun Test() {
-    UpTodoTheme {
-        TaskDetailContent(
-            taskDetail = fakeTaskDetails[1],
-            subTask = fakeTaskDetails.take(2),
-            showDialog = {}
-        )
     }
 }

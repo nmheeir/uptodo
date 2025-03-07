@@ -39,8 +39,8 @@ class UptodoDatabase(
         CategoryEntity::class,
         FocusSessionEntity::class
     ],
-    version = 1,
-    exportSchema = true
+    version = 2,
+//    exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class InternalDatabase : RoomDatabase() {

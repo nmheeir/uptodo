@@ -1,5 +1,6 @@
 package com.kt.uptodo.extensions
 
+import android.icu.util.LocaleData
 import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDateTime
@@ -19,6 +20,10 @@ fun LocalDateTime.parseMinute(): String {
     return this.format(formatterMinute)
 }
 
+fun LocalDateTime.parseDate(): String {
+    return this.format(formatter)
+}
+
 fun LocalTime.parse(): String {
     return this.format(formatterSecond)
 }
@@ -26,7 +31,7 @@ fun LocalTime.parse(): String {
 fun LocalDateTime.convertToDeadline(): String {
     val now = LocalDateTime.now()
 
-    val deadlineText = if (now.dayOfMonth == this.dayOfMonth) {
+    val deadlineText = if (now.dayOfMonth == this.dayOfMonth && now < this) {
         "Today at " + this.parseMinute()
     } else {
         val duration = Duration.between(now, this)
@@ -35,7 +40,8 @@ fun LocalDateTime.convertToDeadline(): String {
         val daysLeft = duration.toDays()
 
         when {
-            minutesLeft < 60 -> "Due in $minutesLeft minutes"
+            now > this -> "Overdue"
+            minutesLeft in 1..60 -> "Due in $minutesLeft minutes"
             hoursLeft < 24 -> "Due in $hoursLeft hours"
             daysLeft in 1..6 -> {
                 val remainingHours = hoursLeft % 24
@@ -71,4 +77,8 @@ fun LocalTime.toSeconds(): Long {
 
 fun LocalTime.toMilliSeconds(): Long {
     return this.toSeconds() * 1000L
+}
+
+fun Long.parseToTime() : String {
+    return this.toString()
 }

@@ -7,8 +7,6 @@ import java.time.LocalDateTime
 @Entity(tableName = "focus_session")
 data class FocusSessionEntity(
     @PrimaryKey(autoGenerate = true) val focusSessionId: Int = 0,
-    val startTime: LocalDateTime = LocalDateTime.now(),
-    val endTime: LocalDateTime,
     val duration: Long,
     val createdAt: LocalDateTime = LocalDateTime.now()
 )
