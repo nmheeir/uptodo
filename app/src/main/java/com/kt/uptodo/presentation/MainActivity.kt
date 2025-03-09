@@ -1,5 +1,6 @@
 package com.kt.uptodo.presentation
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,6 +27,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -51,6 +53,7 @@ import com.kt.uptodo.presentation.navigation.navigationBuilder
 import com.kt.uptodo.presentation.theme.UpTodoTheme
 import com.kt.uptodo.utils.Constants.NavigationBarHeight
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -59,6 +62,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var database: UptodoDatabase
 
+    @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -67,6 +71,20 @@ class MainActivity : ComponentActivity() {
             UpTodoTheme {
                 val navController = rememberNavController()
                 val backStackEntry by navController.currentBackStackEntryAsState()
+
+                LaunchedEffect(Unit) {
+                    navController.currentBackStack.collect { entries ->
+                        entries.map { entry ->
+                            val route = entry.destination.route ?: "null"
+                            val duration =
+                                entry.arguments?.getLong("duration")?.toString() ?: "no duration"
+                            "$route, duration = $duration"
+                        }.joinToString("\n").let { logString ->
+                            Timber.d("NavigationBackStack: \n$logString")
+                        }
+                    }
+                }
+
 
                 Box(
                     modifier = Modifier
@@ -88,7 +106,11 @@ class MainActivity : ComponentActivity() {
 
                     val shouldShowNavigationBar = remember(backStackEntry) {
                         backStackEntry?.destination?.route == null
-                                || navigationItems.fastAny { it.route == backStackEntry?.destination?.route }
+                                || navigationItems.fastAny {
+                            it.route.substringBefore("?") == backStackEntry?.destination?.route?.substringBefore(
+                                "?"
+                            )
+                        }
                     }
 
                     val navigationBarHeight by animateDpAsState(
@@ -175,9 +197,13 @@ class MainActivity : ComponentActivity() {
                         navigationItems.fastForEach { screens ->
                             key(screens.route) {
                                 NavigationBarItem(
-                                    selected = backStackEntry?.destination?.hierarchy?.any { it.route == screens.route } == true,
+                                    selected = backStackEntry?.destination?.hierarchy?.any {
+                                        it.route == screens.route
+                                    } == true,
                                     onClick = {
-                                        if (backStackEntry?.destination?.hierarchy?.any { it.route == screens.route } == true) {
+                                        if (backStackEntry?.destination?.hierarchy?.any {
+                                                it.route?.substringBefore("?") == screens.route
+                                            } == true) {
                                             backStackEntry?.savedStateHandle?.set(
                                                 "scrollToTop",
                                                 true

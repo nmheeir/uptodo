@@ -11,7 +11,7 @@ sealed class Screens(
 ) {
     data object Index : Screens(R.string.index, R.drawable.ic_home, "index")
     data object Calendar : Screens(R.string.Calendar, R.drawable.ic_calendar_month, "calendar")
-    data object Focus : Screens(R.string.Focus, R.drawable.ic_schedule, "focus")
+    data object Focus : Screens(R.string.Focus, R.drawable.ic_schedule, "focus?duration={duration}")
 
     data object More : Screens(R.string.more, R.drawable.ic_more_horiz, "more")
 

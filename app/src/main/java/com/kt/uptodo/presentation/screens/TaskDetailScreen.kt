@@ -127,7 +127,12 @@ fun TaskDetailScreen(
                     )
                     if (showDurationDialog) {
                         DurationDialog(
-                            onDismiss = { showDurationDialog = false }
+                            onDismiss = { showDurationDialog = false },
+                            onConfirm = {
+                                database.query {
+                                    update(task.task.copy(duration = it))
+                                }
+                            }
                         )
                     }
                 }
@@ -260,6 +265,21 @@ fun TaskDetailScreen(
                                 text = stringResource(R.string.action_complete_task)
                             )
                         }
+                    }
+                }
+
+                item {
+                    TextButton(
+                        onClick = {
+                            navController.navigate("focus?duration=${task.task.duration}") {
+                                popUpTo(navController.currentBackStackEntry?.destination?.id ?: 0) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                        }
+                    ) {
+                        Text(text = "Focus")
                     }
                 }
             }

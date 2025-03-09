@@ -25,7 +25,13 @@ fun NavGraphBuilder.navigationBuilder(
     }
 
     composable(
-        route = Screens.Focus.route
+        route = Screens.Focus.route,
+        arguments = listOf(
+            navArgument("duration") {
+                type = NavType.LongType
+                defaultValue = 0L
+            }
+        )
     ) {
         FocusScreen(navController)
     }

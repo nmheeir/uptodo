@@ -19,9 +19,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpSize
@@ -46,36 +49,42 @@ fun FocusScreen(
     navController: NavHostController,
     viewModel: FocusViewModel = hiltViewModel()
 ) {
-    Scaffold(
-        topBar = {
-            Text(
-                text = "Focus Mode",
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        modifier = Modifier.padding(LocalWindowInsets.current.asPaddingValues())
-    ) { contentPadding ->
-        val focusHistory by viewModel.focusHistory.collectAsStateWithLifecycle()
-        LazyColumn(
-            modifier = Modifier
-                .padding(contentPadding)
-                .fillMaxSize()
-        ) {
-            item {
-                FocusSection(viewModel = viewModel)
-            }
-
-            //Focus history
-            items(
-                items = focusHistory,
-                key = { it.focusSessionId }
-            ) { focusSession ->
+    CompositionLocalProvider(
+        LocalViewModel provides viewModel
+    ) {
+        Scaffold(
+            topBar = {
                 Text(
-                    text = focusSession.duration.toString()
+                    text = "Focus Mode",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Gap(MaterialTheme.padding.medium)
+            },
+            modifier = Modifier.padding(LocalWindowInsets.current.asPaddingValues())
+        ) { contentPadding ->
+            val focusHistory by viewModel.focusHistory.collectAsStateWithLifecycle()
+            LazyColumn(
+                modifier = Modifier
+                    .padding(contentPadding)
+                    .fillMaxSize()
+            ) {
+                item {
+                    FocusSection(
+                        viewModel = viewModel
+                    )
+                }
+
+                //Focus history
+                items(
+                    items = focusHistory,
+                    key = { it.focusSessionId }
+                ) { focusSession ->
+                    Text(
+                        text = focusSession.duration.toString()
+                    )
+                    Gap(MaterialTheme.padding.medium)
+                }
             }
         }
     }
@@ -86,6 +95,7 @@ private fun FocusSection(
     modifier: Modifier = Modifier,
     viewModel: FocusViewModel
 ) {
+//    val viewModel = LocalViewModel.current
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -105,6 +115,7 @@ private fun FocusSection(
             if (state == FocusState.STOPPED) {
                 SelectFocusTime(
                     action = viewModel::onAction,
+                    startTime = viewModel.focusTime
                 )
             } else {
                 Box(
@@ -175,13 +186,16 @@ private fun FocusSectionButton(
 @Composable
 private fun SelectFocusTime(
     modifier: Modifier = Modifier,
+    startTime: LocalTime,
     action: (FocusUiAction) -> Unit
 ) {
     WheelTimePicker(
-        startTime = LocalTime.of(0, 0, 0),
+        startTime = startTime,
         size = DpSize(128.dp, 128.dp),
         modifier = modifier
     ) { time ->
         action(FocusUiAction.SetFocusTime(time))
     }
 }
+
+private val LocalViewModel = compositionLocalOf<FocusViewModel> { error("No ViewModel provided") }

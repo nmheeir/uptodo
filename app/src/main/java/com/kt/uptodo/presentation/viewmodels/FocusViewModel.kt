@@ -25,12 +25,17 @@ class FocusViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val duration = savedStateHandle.get<Long>("duration")
+    private val duration = savedStateHandle.get<Long>("duration")!!
 
-    private var focusTime = if (duration != null) {
+    var focusTime: LocalTime = if (duration != 0L) {
         LocalTime.ofSecondOfDay(duration)
     } else {
         LocalTime.of(0, 0, 0)
+    }
+
+    init {
+        Timber.d(duration.toString())
+        Timber.d(focusTime.toString())
     }
 
     val remainingTime = MutableStateFlow<LocalTime>(LocalTime.of(0, 0, 0))
